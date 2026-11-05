@@ -1,17 +1,21 @@
 import Link from "next/link";
-import { Code2, Github, Linkedin, Mail } from "lucide-react";
+import Image from "next/image";
+import { Mail } from "lucide-react";
 
 export function Footer() {
   return (
     <footer className="border-t border-zinc-800 bg-[#08080c]">
       <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6">
         <div className="grid gap-10 md:grid-cols-3">
-          {/* Brand */}
           <div>
-            <Link href="/" className="flex items-center gap-2 mb-4">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-violet-600 to-cyan-500">
-                <Code2 className="h-4 w-4 text-white" />
-              </div>
+            <Link href="/" className="flex items-center gap-3 mb-4">
+              <Image
+                src="/logo.png"
+                alt="Gaming Relax"
+                width={36}
+                height={36}
+                className="rounded-lg object-contain"
+              />
               <span className="font-semibold text-white">Gaming Relax</span>
             </Link>
             <p className="text-sm text-zinc-400 leading-relaxed">
@@ -20,7 +24,6 @@ export function Footer() {
             </p>
           </div>
 
-          {/* Links */}
           <div>
             <h4 className="mb-4 text-sm font-semibold text-white">Navigazione</h4>
             <ul className="space-y-2 text-sm text-zinc-400">
@@ -32,6 +35,11 @@ export function Footer() {
               <li>
                 <Link href="/#progetti" className="hover:text-violet-400 transition-colors">
                   Progetti
+                </Link>
+              </li>
+              <li>
+                <Link href="/#team" className="hover:text-violet-400 transition-colors">
+                  Team
                 </Link>
               </li>
               <li>
@@ -47,7 +55,6 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* Legal + Contact */}
           <div>
             <h4 className="mb-4 text-sm font-semibold text-white">Legale & Contatti</h4>
             <ul className="space-y-2 text-sm text-zinc-400">

@@ -1,13 +1,15 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useState } from "react";
-import { Menu, X, Code2 } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navLinks = [
   { href: "/#servizi", label: "Servizi" },
   { href: "/#progetti", label: "Progetti" },
+  { href: "/#team", label: "Team" },
   { href: "/#chi-siamo", label: "Chi siamo" },
   { href: "/contatti", label: "Contatti" },
 ];
@@ -18,17 +20,21 @@ export function Navbar() {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 border-b border-zinc-800/80 bg-[#0a0a0f]/90 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
-        <Link href="/" className="flex items-center gap-2 group">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-violet-600 to-cyan-500 shadow-lg shadow-violet-500/20">
-            <Code2 className="h-5 w-5 text-white" />
-          </div>
-          <span className="text-lg font-semibold tracking-tight text-white group-hover:text-violet-300 transition-colors">
+        <Link href="/" className="flex items-center gap-3 group">
+          <Image
+            src="/logo.png"
+            alt="Gaming Relax Logo"
+            width={42}
+            height={42}
+            className="rounded-lg object-contain drop-shadow-lg group-hover:scale-105 transition-transform"
+            priority
+          />
+          <span className="text-lg font-semibold tracking-tight text-white group-hover:text-violet-300 transition-colors hidden sm:block">
             Gaming Relax
           </span>
         </Link>
 
-        {/* Desktop nav */}
-        <nav className="hidden md:flex items-center gap-8">
+        <nav className="hidden md:flex items-center gap-7">
           {navLinks.map((link) => (
             <Link
               key={link.href}
@@ -46,7 +52,6 @@ export function Navbar() {
           </Link>
         </nav>
 
-        {/* Mobile toggle */}
         <button
           className="md:hidden p-2 text-zinc-400 hover:text-white"
           onClick={() => setOpen(!open)}
@@ -56,11 +61,10 @@ export function Navbar() {
         </button>
       </div>
 
-      {/* Mobile menu */}
       <div
         className={cn(
           "md:hidden overflow-hidden transition-all duration-300 border-t border-zinc-800",
-          open ? "max-h-80 opacity-100" : "max-h-0 opacity-0"
+          open ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
         )}
       >
         <nav className="flex flex-col gap-1 px-4 py-4 bg-[#0a0a0f]">

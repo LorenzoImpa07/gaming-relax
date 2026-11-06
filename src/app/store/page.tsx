@@ -69,20 +69,32 @@ export default function StorePage() {
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-12">
         <h1 className="text-3xl font-bold text-white sm:text-4xl">Store Servizi</h1>
         <p className="mt-4 text-zinc-400 max-w-2xl mx-auto">
-          Scegli il pacchetto piu adatto. Prezzi trasparenti e supporto incluso.
+          {"Scegli il pacchetto pi\u00f9 adatto. Prezzi trasparenti e supporto incluso."}
         </p>
       </motion.div>
 
       <div className="grid gap-8 lg:grid-cols-[240px_1fr]">
         <aside className="h-fit rounded-2xl border border-zinc-800 bg-zinc-900/50 p-5 space-y-6 sticky top-24">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wider text-fuchsia-400 mb-3">Disponibilita</p>
+            <p className="text-xs font-semibold uppercase tracking-wider text-fuchsia-400 mb-3">
+              {"Disponibilit\u00e0"}
+            </p>
             <label className="flex items-center gap-2 text-sm text-zinc-300 mb-2 cursor-pointer">
-              <input type="checkbox" checked={showAvailable} onChange={(e) => setShowAvailable(e.target.checked)} className="accent-fuchsia-500" />
+              <input
+                type="checkbox"
+                checked={showAvailable}
+                onChange={(e) => setShowAvailable(e.target.checked)}
+                className="accent-fuchsia-500"
+              />
               Disponibile ({countAvailable})
             </label>
             <label className="flex items-center gap-2 text-sm text-zinc-300 cursor-pointer">
-              <input type="checkbox" checked={showSoldOut} onChange={(e) => setShowSoldOut(e.target.checked)} className="accent-fuchsia-500" />
+              <input
+                type="checkbox"
+                checked={showSoldOut}
+                onChange={(e) => setShowSoldOut(e.target.checked)}
+                className="accent-fuchsia-500"
+              />
               Esaurito ({countSoldOut})
             </label>
           </div>
@@ -90,9 +102,19 @@ export default function StorePage() {
             <p className="text-xs font-semibold uppercase tracking-wider text-fuchsia-400 mb-3">Prezzo</p>
             <div className="flex justify-between text-sm text-zinc-400 mb-2">
               <span>{EUR}0</span>
-              <span>{EUR}{maxPrice}</span>
+              <span>
+                {EUR}
+                {maxPrice}
+              </span>
             </div>
-            <input type="range" min={0} max={priceCeiling} value={maxPrice} onChange={(e) => setMaxPrice(Number(e.target.value))} className="w-full accent-fuchsia-500" />
+            <input
+              type="range"
+              min={0}
+              max={priceCeiling}
+              value={maxPrice}
+              onChange={(e) => setMaxPrice(Number(e.target.value))}
+              className="w-full accent-fuchsia-500"
+            />
           </div>
         </aside>
 
@@ -107,12 +129,14 @@ export default function StorePage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.05 }}
               className={`relative rounded-2xl border p-6 flex flex-col ${
-                service.popular ? "border-violet-500/50 bg-violet-500/5" : "border-zinc-800 bg-zinc-900/40"
+                service.popular
+                  ? "border-violet-500/50 bg-violet-500/5"
+                  : "border-zinc-800 bg-zinc-900/40"
               }`}
             >
               {service.popular && (
                 <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-gradient-to-r from-violet-600 to-cyan-500 px-3 py-0.5 text-xs font-semibold text-white">
-                  Piu richiesto
+                  {"Pi\u00f9 richiesto"}
                 </span>
               )}
               {service.available === false && (
@@ -121,20 +145,29 @@ export default function StorePage() {
                 </span>
               )}
               <Link href={`/store/${service.id}`} className="group">
-                <h3 className="text-xl font-semibold text-white group-hover:text-violet-300">{service.name}</h3>
+                <h3 className="text-xl font-semibold text-white group-hover:text-violet-300">
+                  {service.name}
+                </h3>
                 <p className="mt-2 text-sm text-zinc-400 line-clamp-3">{service.description}</p>
               </Link>
               <div className="mt-4 mb-5">
                 {service.discountPercent && service.discountPercent > 0 ? (
                   <>
-                    <span className="text-lg text-zinc-500 line-through mr-2">{EUR}{service.price}</span>
+                    <span className="text-lg text-zinc-500 line-through mr-2">
+                      {EUR}
+                      {service.price}
+                    </span>
                     <span className="text-3xl font-bold text-white">
-                      {EUR}{Math.round(service.price * (1 - service.discountPercent / 100) * 100) / 100}
+                      {EUR}
+                      {Math.round(service.price * (1 - service.discountPercent / 100) * 100) / 100}
                     </span>
                     <span className="ml-2 text-xs text-green-400">-{service.discountPercent}%</span>
                   </>
                 ) : (
-                  <span className="text-3xl font-bold text-white">{EUR}{service.price}</span>
+                  <span className="text-3xl font-bold text-white">
+                    {EUR}
+                    {service.price}
+                  </span>
                 )}
                 <span className="text-zinc-500 text-sm ml-1">una tantum</span>
               </div>
@@ -147,7 +180,10 @@ export default function StorePage() {
                 ))}
               </ul>
               <div className="flex flex-col gap-2 mt-auto">
-                <Link href={`/store/${service.id}`} className="text-center text-sm text-violet-400 hover:underline">
+                <Link
+                  href={`/store/${service.id}`}
+                  className="text-center text-sm text-violet-400 hover:underline"
+                >
                   Vedi dettagli
                 </Link>
                 <button

@@ -48,8 +48,8 @@ export function Footer() {
               <span className="font-semibold text-white">Gaming Relax</span>
             </Link>
             <p className="text-sm text-zinc-400 leading-relaxed mb-5">
-              Sviluppiamo applicazioni, bot Discord e software custom.
-              Soluzioni concrete, codice pulito, risultati reali.
+              Sviluppiamo applicazioni, bot Discord e software custom. Soluzioni concrete, codice
+              pulito, risultati reali.
             </p>
             <div className="flex items-center gap-3">
               {socials.map((s) => (
@@ -70,30 +70,80 @@ export function Footer() {
           <div>
             <h4 className="mb-4 text-sm font-semibold text-white">Navigazione</h4>
             <ul className="space-y-2 text-sm text-zinc-400">
-              <li><Link href="/" className="hover:text-violet-400 transition-colors">Home</Link></li>
-              <li><Link href="/store" className="hover:text-violet-400 transition-colors">Store</Link></li>
-              <li><Link href="/novita" className="hover:text-violet-400 transition-colors">Novit\u00e0</Link></li>
-              <li><Link href="/forum" className="hover:text-violet-400 transition-colors">Forum</Link></li>
-              <li><Link href="/#team" className="hover:text-violet-400 transition-colors">Team</Link></li>
-              <li><Link href="/recensioni" className="hover:text-violet-400 transition-colors">Recensioni</Link></li>
-              <li><Link href="/contatti" className="hover:text-violet-400 transition-colors">Contatti</Link></li>
-            </ul>
-          </div>
-
-          <div>
-            <h4 className="mb-4 text-sm font-semibold uppercase tracking-wider text-zinc-300">Link utili</h4>
-            <ul className="space-y-2 text-sm text-zinc-400">
-              <li><Link href="/faq" className="hover:text-violet-400 transition-colors">FAQ (Domande Frequenti)</Link></li>
-              <li><Link href="/termini" className="hover:text-violet-400 transition-colors">Termini e Condizioni</Link></li>
-              <li><Link href="/privacy" className="hover:text-violet-400 transition-colors">Privacy Policy</Link></li>
-              <li><Link href="/cookie" className="hover:text-violet-400 transition-colors">Cookies</Link></li>
-              <li><Link href="/#chi-siamo" className="hover:text-violet-400 transition-colors">Chi siamo</Link></li>
+              <li>
+                <Link href="/" className="hover:text-violet-400 transition-colors">
+                  Home
+                </Link>
+              </li>
+              <li>
+                <Link href="/store" className="hover:text-violet-400 transition-colors">
+                  Store
+                </Link>
+              </li>
+              <li>
+                <Link href="/novita" className="hover:text-violet-400 transition-colors">
+                  {"Novit\u00e0"}
+                </Link>
+              </li>
+              <li>
+                <Link href="/forum" className="hover:text-violet-400 transition-colors">
+                  Forum
+                </Link>
+              </li>
+              <li>
+                <Link href="/#team" className="hover:text-violet-400 transition-colors">
+                  Team
+                </Link>
+              </li>
+              <li>
+                <Link href="/recensioni" className="hover:text-violet-400 transition-colors">
+                  Recensioni
+                </Link>
+              </li>
+              <li>
+                <Link href="/contatti" className="hover:text-violet-400 transition-colors">
+                  Contatti
+                </Link>
+              </li>
             </ul>
           </div>
 
           <div>
             <h4 className="mb-4 text-sm font-semibold uppercase tracking-wider text-zinc-300">
-              Orari di supporto & disponibilit\u00e0
+              Link utili
+            </h4>
+            <ul className="space-y-2 text-sm text-zinc-400">
+              <li>
+                <Link href="/faq" className="hover:text-violet-400 transition-colors">
+                  FAQ (Domande Frequenti)
+                </Link>
+              </li>
+              <li>
+                <Link href="/termini" className="hover:text-violet-400 transition-colors">
+                  Termini e Condizioni
+                </Link>
+              </li>
+              <li>
+                <Link href="/privacy" className="hover:text-violet-400 transition-colors">
+                  Privacy Policy
+                </Link>
+              </li>
+              <li>
+                <Link href="/cookie" className="hover:text-violet-400 transition-colors">
+                  Cookies
+                </Link>
+              </li>
+              <li>
+                <Link href="/#chi-siamo" className="hover:text-violet-400 transition-colors">
+                  Chi siamo
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 className="mb-4 text-sm font-semibold uppercase tracking-wider text-zinc-300">
+              {"Orari di supporto & disponibilit\u00e0"}
             </h4>
             <ul className="space-y-2 text-sm text-zinc-400">
               <li>Lun - Ven: 10:00 - 19:00</li>
@@ -113,9 +163,9 @@ export function Footer() {
 
         <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-zinc-800 pt-8 sm:flex-row">
           <p className="text-xs text-zinc-500">
-            \u00a9 {new Date().getFullYear()} Gaming Relax. Tutti i diritti riservati.
+            {"\u00a9 "}{new Date().getFullYear()} Gaming Relax. Tutti i diritti riservati.
           </p>
-          <p className="text-xs text-zinc-500">P.IVA: da inserire \u2022 gamingrelaxofficials.it</p>
+          <p className="text-xs text-zinc-500">P.IVA: da inserire - gamingrelaxofficials.it</p>
         </div>
       </div>
     </footer>

@@ -8,6 +8,10 @@ import {
   ShoppingBag,
   Star,
   MessageSquare,
+  Package,
+  Users,
+  Handshake,
+  Megaphone,
   LogOut,
   ArrowLeft,
 } from "lucide-react";
@@ -20,6 +24,10 @@ const nav = [
   { href: "/admin/ordini", label: "Ordini", icon: ShoppingBag },
   { href: "/admin/recensioni", label: "Recensioni", icon: Star },
   { href: "/admin/messaggi", label: "Messaggi", icon: MessageSquare },
+  { href: "/admin/servizi", label: "Servizi", icon: Package },
+  { href: "/admin/team", label: "Team", icon: Users },
+  { href: "/admin/partner", label: "Partner", icon: Handshake },
+  { href: "/admin/novita", label: "Novità", icon: Megaphone },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -55,17 +63,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <p className="text-sm text-zinc-500 mt-1">{user.email}</p>
         </div>
         <div className="flex items-center gap-2">
-          <Link
-            href="/"
-            className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-700 px-3 py-2 text-sm text-zinc-300 hover:bg-zinc-900"
-          >
+          <Link href="/" className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-700 px-3 py-2 text-sm text-zinc-300 hover:bg-zinc-900">
             <ArrowLeft className="h-4 w-4" />
             Sito
           </Link>
-          <button
-            onClick={() => logout()}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-700 px-3 py-2 text-sm text-zinc-300 hover:bg-zinc-900"
-          >
+          <button onClick={() => logout()} className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-700 px-3 py-2 text-sm text-zinc-300 hover:bg-zinc-900">
             <LogOut className="h-4 w-4" />
             Esci
           </button>
@@ -80,10 +82,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               key={item.href}
               href={item.href}
               className={cn(
-                "inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-colors",
-                active
-                  ? "bg-violet-600 text-white"
-                  : "border border-zinc-700 text-zinc-400 hover:text-white hover:border-zinc-500"
+                "inline-flex items-center gap-2 rounded-full px-3.5 py-2 text-sm font-medium transition-colors",
+                active ? "bg-violet-600 text-white" : "border border-zinc-700 text-zinc-400 hover:text-white hover:border-zinc-500"
               )}
             >
               <item.icon className="h-4 w-4" />

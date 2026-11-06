@@ -1,10 +1,16 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 
-const partners = [
+type Partner = { id: string; name: string; href: string; image: string };
+
+const fallback: Partner[] = [
   {
+    id: "fallback",
     name: "Mega Wolf",
     href: "#",
     image: "https://images.unsplash.com/photo-1614680376408-81e91ffe3db7?w=400&q=80",
@@ -12,15 +18,23 @@ const partners = [
 ];
 
 export function Partners() {
+  const [partners, setPartners] = useState<Partner[]>(fallback);
+
+  useEffect(() => {
+    getDocs(collection(db, "site_partners"))
+      .then((snap) => {
+        if (!snap.empty) {
+          setPartners(snap.docs.map((d) => ({ id: d.id, ...d.data() } as Partner)));
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   return (
     <section className="relative py-24 sm:py-28 overflow-hidden">
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-violet-950/20 via-transparent to-transparent pointer-events-none" />
       <div className="relative mx-auto max-w-6xl px-4 sm:px-6 text-center">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-        >
+        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
           <h2 className="text-3xl font-bold text-white sm:text-4xl">I nostri partner</h2>
           <p className="mt-3 text-zinc-400">I brand e gli studi con cui collaboriamo.</p>
         </motion.div>
@@ -28,10 +42,10 @@ export function Partners() {
         <div className="mt-12 flex flex-wrap items-center justify-center gap-6">
           {partners.map((partner, i) => (
             <motion.a
-              key={partner.name}
-              href={partner.href}
-              target={partner.href.startsWith("http") ? "_blank" : undefined}
-              rel={partner.href.startsWith("http") ? "noopener noreferrer" : undefined}
+              key={partner.id}
+              href={partner.href || "#"}
+              target={partner.href?.startsWith("http") ? "_blank" : undefined}
+              rel={partner.href?.startsWith("http") ? "noopener noreferrer" : undefined}
               initial={{ opacity: 0, scale: 0.9 }}
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
@@ -39,13 +53,7 @@ export function Partners() {
               className="group relative flex h-28 w-28 sm:h-32 sm:w-32 items-center justify-center rounded-2xl border border-zinc-700/80 bg-zinc-900/60 p-3 shadow-lg shadow-black/30 transition-all hover:border-violet-500/50 hover:bg-zinc-900 hover:scale-105"
               title={partner.name}
             >
-              <Image
-                src={partner.image}
-                alt={partner.name}
-                width={120}
-                height={120}
-                className="rounded-xl object-cover w-full h-full"
-              />
+              <Image src={partner.image} alt={partner.name} width={120} height={120} className="rounded-xl object-cover w-full h-full" />
             </motion.a>
           ))}
         </div>

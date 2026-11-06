@@ -1,27 +1,35 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Megaphone } from "lucide-react";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 
-const news = [
+type News = { id: string; title: string; date: string; text: string };
+
+const fallback: News[] = [
   {
+    id: "1",
     title: "Nuovi pacchetti Bot Discord Pro",
     date: "Novembre 2026",
     text: "Abbiamo aggiornato il piano Pro con dashboard web e ticket system migliorato.",
   },
-  {
-    title: "Apertura store servizi online",
-    date: "Ottobre 2026",
-    text: "Ora puoi scegliere e ordinare i nostri servizi direttamente dallo Store del sito.",
-  },
-  {
-    title: "Supporto prioritario mensile",
-    date: "Ottobre 2026",
-    text: "Disponibile il piano di manutenzione e supporto continuo per i progetti già consegnati.",
-  },
 ];
 
 export default function NovitaPage() {
+  const [news, setNews] = useState<News[]>(fallback);
+
+  useEffect(() => {
+    getDocs(collection(db, "site_news"))
+      .then((snap) => {
+        if (!snap.empty) {
+          setNews(snap.docs.map((d) => ({ id: d.id, ...d.data() } as News)));
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   return (
     <div className="mx-auto max-w-3xl px-4 py-16 sm:px-6 sm:py-24">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-12">
@@ -32,7 +40,7 @@ export default function NovitaPage() {
       <div className="space-y-4">
         {news.map((item, i) => (
           <motion.article
-            key={item.title}
+            key={item.id}
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.08 }}

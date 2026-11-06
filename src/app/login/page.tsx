@@ -2,10 +2,11 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { LogIn, Mail, Lock } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import { isAdminEmail } from "@/lib/admin";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -14,6 +15,8 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const { login } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const next = searchParams.get("next") || "/";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -21,11 +24,19 @@ export default function LoginPage() {
     setLoading(true);
     try {
       await login(email, password);
-      router.push("/");
+      if (isAdminEmail(email)) {
+        router.push("/admin");
+      } else {
+        router.push(next || "/");
+      }
     } catch (err: unknown) {
       const message =
         err instanceof Error ? err.message : "Errore durante l'accesso";
-      if (message.includes("user-not-found") || message.includes("wrong-password") || message.includes("invalid-credential")) {
+      if (
+        message.includes("user-not-found") ||
+        message.includes("wrong-password") ||
+        message.includes("invalid-credential")
+      ) {
         setError("Email o password non corretti");
       } else {
         setError("Errore durante l'accesso. Riprova.");
@@ -47,9 +58,7 @@ export default function LoginPage() {
             <LogIn className="h-6 w-6" />
           </div>
           <h1 className="text-2xl font-bold text-white">Accedi</h1>
-          <p className="mt-2 text-sm text-zinc-400">
-            Accedi al tuo account Gaming Relax
-          </p>
+          <p className="mt-2 text-sm text-zinc-400">Accedi al tuo account Gaming Relax</p>
         </div>
 
         {error && (

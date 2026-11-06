@@ -3,9 +3,10 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
-import { Menu, X, ShoppingCart, User } from "lucide-react";
+import { Menu, X, ShoppingCart, User, LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCart } from "@/context/CartContext";
+import { useAuth } from "@/context/AuthContext";
 
 const navLinks = [
   { href: "/#servizi", label: "Servizi" },
@@ -18,6 +19,12 @@ const navLinks = [
 export function Navbar() {
   const [open, setOpen] = useState(false);
   const { count } = useCart();
+  const { user, logout, loading } = useAuth();
+
+  const handleLogout = async () => {
+    await logout();
+    setOpen(false);
+  };
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 border-b border-zinc-800/80 bg-[#0a0a0f]/90 backdrop-blur-md">
@@ -60,13 +67,30 @@ export function Navbar() {
             )}
           </Link>
 
-          <Link
-            href="/login"
-            className="flex items-center gap-1.5 text-sm font-medium text-zinc-400 hover:text-white transition-colors"
-          >
-            <User className="h-4 w-4" />
-            Accedi
-          </Link>
+          {!loading && (
+            user ? (
+              <div className="flex items-center gap-3">
+                <span className="text-sm text-zinc-300 max-w-[120px] truncate">
+                  {user.displayName || user.email}
+                </span>
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center gap-1.5 text-sm font-medium text-zinc-400 hover:text-white transition-colors"
+                  title="Esci"
+                >
+                  <LogOut className="h-4 w-4" />
+                </button>
+              </div>
+            ) : (
+              <Link
+                href="/login"
+                className="flex items-center gap-1.5 text-sm font-medium text-zinc-400 hover:text-white transition-colors"
+              >
+                <User className="h-4 w-4" />
+                Accedi
+              </Link>
+            )
+          )}
 
           <Link
             href="/contatti"
@@ -112,13 +136,22 @@ export function Navbar() {
               {link.label}
             </Link>
           ))}
-          <Link
-            href="/login"
-            onClick={() => setOpen(false)}
-            className="rounded-lg px-4 py-3 text-zinc-300 hover:bg-zinc-900 hover:text-white transition-colors"
-          >
-            Accedi / Registrati
-          </Link>
+          {user ? (
+            <button
+              onClick={handleLogout}
+              className="rounded-lg px-4 py-3 text-left text-zinc-300 hover:bg-zinc-900 hover:text-white transition-colors"
+            >
+              Esci ({user.displayName || user.email})
+            </button>
+          ) : (
+            <Link
+              href="/login"
+              onClick={() => setOpen(false)}
+              className="rounded-lg px-4 py-3 text-zinc-300 hover:bg-zinc-900 hover:text-white transition-colors"
+            >
+              Accedi / Registrati
+            </Link>
+          )}
           <Link
             href="/contatti"
             onClick={() => setOpen(false)}

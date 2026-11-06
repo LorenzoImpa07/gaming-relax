@@ -13,6 +13,7 @@ import {
   Handshake,
   Megaphone,
   Percent,
+  MessagesSquare,
   LogOut,
   ArrowLeft,
 } from "lucide-react";
@@ -30,6 +31,7 @@ const nav = [
   { href: "/admin/partner", label: "Partner", icon: Handshake },
   { href: "/admin/novita", label: "Novità", icon: Megaphone },
   { href: "/admin/sconti", label: "Sconti", icon: Percent },
+  { href: "/admin/forum", label: "Forum", icon: MessagesSquare },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {

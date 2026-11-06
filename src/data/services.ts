@@ -8,6 +8,7 @@ export type Service = {
   features: string[];
   popular?: boolean;
   available?: boolean;
+  discountPercent?: number;
 };
 
 export const services: Service[] = [

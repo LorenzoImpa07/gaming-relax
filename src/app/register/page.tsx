@@ -2,8 +2,10 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { UserPlus, Mail, Lock, User } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
 
 export default function RegisterPage() {
   const [form, setForm] = useState({
@@ -13,17 +15,41 @@ export default function RegisterPage() {
     confirm: "",
   });
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const { register } = useAuth();
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
+
     if (form.password !== form.confirm) {
-      alert("Le password non coincidono");
+      setError("Le password non coincidono");
       return;
     }
+    if (form.password.length < 6) {
+      setError("La password deve avere almeno 6 caratteri");
+      return;
+    }
+
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 1000));
-    alert("Registrazione demo: in seguito collegheremo Firebase Auth.");
-    setLoading(false);
+    try {
+      await register(form.name, form.email, form.password);
+      router.push("/");
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Errore durante la registrazione";
+      if (message.includes("email-already-in-use")) {
+        setError("Questa email è già registrata");
+      } else if (message.includes("weak-password")) {
+        setError("Password troppo debole");
+      } else if (message.includes("invalid-email")) {
+        setError("Email non valida");
+      } else {
+        setError("Errore durante la registrazione. Riprova.");
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -42,6 +68,12 @@ export default function RegisterPage() {
             Registrati per gestire ordini e progetti
           </p>
         </div>
+
+        {error && (
+          <div className="mb-4 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+            {error}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
@@ -81,11 +113,11 @@ export default function RegisterPage() {
               <input
                 type="password"
                 required
-                minLength={8}
+                minLength={6}
                 value={form.password}
                 onChange={(e) => setForm({ ...form, password: e.target.value })}
                 className="w-full rounded-xl border border-zinc-700 bg-zinc-950 pl-10 pr-4 py-3 text-white placeholder-zinc-500 focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500"
-                placeholder="Minimo 8 caratteri"
+                placeholder="Minimo 6 caratteri"
               />
             </div>
           </div>

@@ -69,6 +69,7 @@ const projects = [
     description:
       "Sistema completo di moderazione con log, auto-mod, ruoli temporanei, ticket e dashboard web di gestione.",
     tags: ["Discord.js", "Node.js", "MongoDB", "Dashboard"],
+    image: "https://images.unsplash.com/photo-1614680376573-df3480f0c6ff?w=800&q=80",
   },
   {
     title: "Piattaforma Gestionale Interna",
@@ -76,6 +77,7 @@ const projects = [
     description:
       "Applicazione web per gestione ordini, clienti e reportistica con autenticazione e ruoli multipli.",
     tags: ["Next.js", "TypeScript", "PostgreSQL", "Auth"],
+    image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80",
   },
   {
     title: "Tool di Automazione Community",
@@ -83,6 +85,7 @@ const projects = [
     description:
       "Sistema di automazioni tra Discord, Google Sheets e notifiche per gestire eventi e iscrizioni in modo automatico.",
     tags: ["Node.js", "API", "Webhook", "Cron"],
+    image: "https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=800&q=80",
   },
   {
     title: "Bot Economia & Giochi",
@@ -90,6 +93,7 @@ const projects = [
     description:
       "Bot completo di economia, ranking, minigiochi e shop virtuale con persistenza dati e leaderboard.",
     tags: ["Discord.js", "SQLite", "Canvas", "Economy"],
+    image: "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=800&q=80",
   },
 ];
 
@@ -113,7 +117,6 @@ const team = [
 export default function HomePage() {
   return (
     <>
-      {/* Hero */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-violet-950/30 via-transparent to-transparent pointer-events-none" />
         <div className="absolute top-20 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-violet-600/10 rounded-full blur-3xl pointer-events-none" />
@@ -165,16 +168,12 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Servizi */}
       <section id="servizi" className="py-24 sm:py-32">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <motion.div {...fadeIn} className="text-center mb-16">
-            <h2 className="text-3xl font-bold text-white sm:text-4xl">
-              Cosa facciamo
-            </h2>
+            <h2 className="text-3xl font-bold text-white sm:text-4xl">Cosa facciamo</h2>
             <p className="mt-4 text-zinc-400 max-w-2xl mx-auto">
-              Un team compatto che copre lo sviluppo end-to-end:
-              dall&apos;idea al deploy, passando per design, logica e manutenzione.
+              Un team compatto che copre lo sviluppo end-to-end: dall&apos;idea al deploy.
             </p>
           </motion.div>
 
@@ -188,31 +187,23 @@ export default function HomePage() {
                 transition={{ duration: 0.4, delay: i * 0.08 }}
                 className="group relative rounded-2xl border border-zinc-800 bg-zinc-900/40 p-6 transition-all hover:border-violet-500/40 hover:bg-zinc-900/70"
               >
-                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-violet-600/20 to-cyan-500/20 text-violet-400 group-hover:from-violet-600/30 group-hover:to-cyan-500/30 transition-colors">
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-violet-600/20 to-cyan-500/20 text-violet-400">
                   <service.icon className="h-6 w-6" />
                 </div>
-                <h3 className="mb-2 text-lg font-semibold text-white">
-                  {service.title}
-                </h3>
-                <p className="text-sm text-zinc-400 leading-relaxed">
-                  {service.description}
-                </p>
+                <h3 className="mb-2 text-lg font-semibold text-white">{service.title}</h3>
+                <p className="text-sm text-zinc-400 leading-relaxed">{service.description}</p>
               </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Progetti */}
       <section id="progetti" className="py-24 sm:py-32 bg-zinc-950/50">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <motion.div {...fadeIn} className="text-center mb-16">
-            <h2 className="text-3xl font-bold text-white sm:text-4xl">
-              Progetti recenti
-            </h2>
+            <h2 className="text-3xl font-bold text-white sm:text-4xl">Progetti recenti</h2>
             <p className="mt-4 text-zinc-400 max-w-2xl mx-auto">
               Alcuni esempi di lavori realizzati.
-              Ogni progetto è unico e costruito sulle esigenze reali del cliente.
             </p>
           </motion.div>
 
@@ -224,28 +215,29 @@ export default function HomePage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.4, delay: i * 0.1 }}
-                className="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-6 hover:border-zinc-700 transition-colors"
+                className="rounded-2xl border border-zinc-800 bg-zinc-900/40 overflow-hidden hover:border-zinc-700 transition-colors"
               >
-                <div className="mb-3 flex items-center justify-between">
-                  <span className="text-xs font-medium uppercase tracking-wider text-violet-400">
+                <div className="relative h-44 w-full overflow-hidden">
+                  <Image
+                    src={project.image}
+                    alt={project.title}
+                    fill
+                    className="object-cover transition-transform duration-500 hover:scale-105"
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-zinc-900/80 to-transparent" />
+                  <span className="absolute bottom-3 left-4 text-xs font-medium uppercase tracking-wider text-violet-300">
                     {project.category}
                   </span>
                 </div>
-                <h3 className="mb-2 text-xl font-semibold text-white">
-                  {project.title}
-                </h3>
-                <p className="mb-4 text-sm text-zinc-400 leading-relaxed">
-                  {project.description}
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  {project.tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="rounded-full bg-zinc-800 px-3 py-1 text-xs text-zinc-300"
-                    >
-                      {tag}
-                    </span>
-                  ))}
+                <div className="p-6">
+                  <h3 className="mb-2 text-xl font-semibold text-white">{project.title}</h3>
+                  <p className="mb-4 text-sm text-zinc-400 leading-relaxed">{project.description}</p>
+                  <div className="flex flex-wrap gap-2">
+                    {project.tags.map((tag) => (
+                      <span key={tag} className="rounded-full bg-zinc-800 px-3 py-1 text-xs text-zinc-300">{tag}</span>
+                    ))}
+                  </div>
                 </div>
               </motion.div>
             ))}
@@ -253,16 +245,12 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Team */}
       <section id="team" className="py-24 sm:py-32">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <motion.div {...fadeIn} className="text-center mb-16">
-            <h2 className="text-3xl font-bold text-white sm:text-4xl">
-              Il Team
-            </h2>
+            <h2 className="text-3xl font-bold text-white sm:text-4xl">Il Team</h2>
             <p className="mt-4 text-zinc-400 max-w-2xl mx-auto">
               Siamo in due, appassionati di codice e di soluzioni concrete.
-              Ecco chi c&apos;è dietro Gaming Relax.
             </p>
           </motion.div>
 
@@ -278,54 +266,54 @@ export default function HomePage() {
               >
                 <div className="mx-auto mb-5 flex h-28 w-28 items-center justify-center rounded-full bg-gradient-to-br from-violet-600/20 to-cyan-500/20 border border-zinc-700 overflow-hidden">
                   {member.image ? (
-                    <Image
-                      src={member.image}
-                      alt={member.name}
-                      width={112}
-                      height={112}
-                      className="object-cover w-full h-full"
-                    />
+                    <Image src={member.image} alt={member.name} width={112} height={112} className="object-cover w-full h-full" />
                   ) : (
                     <User className="h-12 w-12 text-zinc-500" />
                   )}
                 </div>
                 <h3 className="text-xl font-semibold text-white">{member.name}</h3>
                 <p className="mt-1 text-sm font-medium text-violet-400">{member.role}</p>
-                <p className="mt-4 text-sm text-zinc-400 leading-relaxed">
-                  {member.description}
-                </p>
+                <p className="mt-4 text-sm text-zinc-400 leading-relaxed">{member.description}</p>
               </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Chi siamo */}
+      <section className="py-12 overflow-hidden">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {[
+              "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=600&q=80",
+              "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600&q=80",
+              "https://images.unsplash.com/photo-1498050108023-c8199c3246c7?w=600&q=80",
+              "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=600&q=80",
+            ].map((src, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, scale: 0.95 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-zinc-800"
+              >
+                <Image src={src} alt={`Workspace ${i + 1}`} fill className="object-cover hover:scale-105 transition-transform duration-500" sizes="(max-width: 768px) 50vw, 25vw" />
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section id="chi-siamo" className="py-24 sm:py-32 bg-zinc-950/50">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
             <motion.div {...fadeIn}>
-              <h2 className="text-3xl font-bold text-white sm:text-4xl">
-                Chi siamo
-              </h2>
+              <h2 className="text-3xl font-bold text-white sm:text-4xl">Chi siamo</h2>
               <p className="mt-6 text-zinc-400 leading-relaxed">
-                Siamo un team di due sviluppatori appassionati di codice e di soluzioni
-                pratiche. Lavoriamo principalmente su applicazioni custom, bot Discord
-                e tool che risolvono problemi concreti.
+                Siamo un team di due sviluppatori appassionati di codice e di soluzioni pratiche.
               </p>
-              <p className="mt-4 text-zinc-400 leading-relaxed">
-                Crediamo in un approccio diretto: ascoltiamo le esigenze, proponiamo
-                la soluzione più adatta (senza over-engineering) e consegniamo codice
-                mantenibile e documentato.
-              </p>
-
               <ul className="mt-8 space-y-3">
-                {[
-                  "Comunicazione chiara e trasparente",
-                  "Codice pulito e documentato",
-                  "Tempi di consegna rispettati",
-                  "Supporto anche dopo il rilascio",
-                ].map((item) => (
+                {["Comunicazione chiara e trasparente", "Codice pulito e documentato", "Tempi di consegna rispettati", "Supporto anche dopo il rilascio"].map((item) => (
                   <li key={item} className="flex items-center gap-3 text-zinc-300">
                     <CheckCircle2 className="h-5 w-5 text-violet-400 shrink-0" />
                     {item}
@@ -333,54 +321,19 @@ export default function HomePage() {
                 ))}
               </ul>
             </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-              className="relative"
-            >
-              <div className="rounded-2xl border border-zinc-800 bg-gradient-to-br from-zinc-900 to-zinc-950 p-8">
-                <div className="grid grid-cols-2 gap-6">
-                  <div className="text-center">
-                    <div className="text-3xl font-bold text-white">2</div>
-                    <div className="mt-1 text-sm text-zinc-400">Sviluppatori</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-3xl font-bold text-white">100%</div>
-                    <div className="mt-1 text-sm text-zinc-400">Remoto</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-3xl font-bold text-white">End-to-end</div>
-                    <div className="mt-1 text-sm text-zinc-400">Dal concept al deploy</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-3xl font-bold text-white">IT</div>
-                    <div className="mt-1 text-sm text-zinc-400">Team italiano</div>
-                  </div>
-                </div>
-              </div>
+            <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} className="relative h-72 rounded-2xl overflow-hidden border border-zinc-800">
+              <Image src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=900&q=80" alt="Team al lavoro" fill className="object-cover" sizes="(max-width: 1024px) 100vw, 50vw" />
             </motion.div>
           </div>
         </div>
       </section>
 
-      {/* CTA finale */}
       <section className="py-24 sm:py-32">
         <div className="mx-auto max-w-4xl px-4 sm:px-6 text-center">
           <motion.div {...fadeIn}>
-            <h2 className="text-3xl font-bold text-white sm:text-4xl">
-              Hai un&apos;idea o un problema da risolvere?
-            </h2>
-            <p className="mt-4 text-lg text-zinc-400">
-              Raccontaci di cosa hai bisogno. Ti rispondiamo rapidamente con un&apos;analisi
-              chiara e senza impegno.
-            </p>
-            <Link
-              href="/contatti"
-              className="mt-8 inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-violet-600 to-cyan-500 px-8 py-4 text-base font-semibold text-white shadow-xl shadow-violet-500/25 transition-all hover:shadow-violet-500/40 hover:scale-105"
-            >
+            <h2 className="text-3xl font-bold text-white sm:text-4xl">Hai un&apos;idea o un problema da risolvere?</h2>
+            <p className="mt-4 text-lg text-zinc-400">Raccontaci di cosa hai bisogno. Ti rispondiamo rapidamente.</p>
+            <Link href="/contatti" className="mt-8 inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-violet-600 to-cyan-500 px-8 py-4 text-base font-semibold text-white shadow-xl shadow-violet-500/25">
               <MessageSquare className="h-5 w-5" />
               Scrivici ora
             </Link>

@@ -32,7 +32,7 @@ const socials = [
   },
   {
     name: "Email",
-    href: "mailto:info@gamingrelaxofficials.it",
+    href: "mailto:supportogamingrelax@gmail.com",
     icon: <Mail className="h-5 w-5" />,
   },
 ];
@@ -72,7 +72,7 @@ export function Footer() {
             <ul className="space-y-2 text-sm text-zinc-400">
               <li><Link href="/" className="hover:text-violet-400 transition-colors">Home</Link></li>
               <li><Link href="/store" className="hover:text-violet-400 transition-colors">Store</Link></li>
-              <li><Link href="/novita" className="hover:text-violet-400 transition-colors">Novità</Link></li>
+              <li><Link href="/novita" className="hover:text-violet-400 transition-colors">Novit\u00e0</Link></li>
               <li><Link href="/forum" className="hover:text-violet-400 transition-colors">Forum</Link></li>
               <li><Link href="/#team" className="hover:text-violet-400 transition-colors">Team</Link></li>
               <li><Link href="/recensioni" className="hover:text-violet-400 transition-colors">Recensioni</Link></li>
@@ -92,24 +92,30 @@ export function Footer() {
           </div>
 
           <div>
-            <h4 className="mb-4 text-sm font-semibold text-white">Contatti</h4>
+            <h4 className="mb-4 text-sm font-semibold uppercase tracking-wider text-zinc-300">
+              Orari di supporto & disponibilit\u00e0
+            </h4>
             <ul className="space-y-2 text-sm text-zinc-400">
-              <li>
-                <a href="mailto:info@gamingrelaxofficials.it" className="flex items-center gap-2 hover:text-violet-400 transition-colors">
+              <li>Lun - Ven: 10:00 - 19:00</li>
+              <li>Sab - Dom: Su appuntamento</li>
+              <li className="pt-2">
+                <a
+                  href="mailto:supportogamingrelax@gmail.com"
+                  className="inline-flex items-center gap-2 text-violet-400 hover:text-violet-300 transition-colors"
+                >
                   <Mail size={14} />
-                  info@gamingrelaxofficials.it
+                  supportogamingrelax@gmail.com
                 </a>
               </li>
-              <li><Link href="/login" className="hover:text-violet-400 transition-colors">Accedi / Registrati</Link></li>
             </ul>
           </div>
         </div>
 
         <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-zinc-800 pt-8 sm:flex-row">
           <p className="text-xs text-zinc-500">
-            © {new Date().getFullYear()} Gaming Relax. Tutti i diritti riservati.
+            \u00a9 {new Date().getFullYear()} Gaming Relax. Tutti i diritti riservati.
           </p>
-          <p className="text-xs text-zinc-500">P.IVA: da inserire • gamingrelaxofficials.it</p>
+          <p className="text-xs text-zinc-500">P.IVA: da inserire \u2022 gamingrelaxofficials.it</p>
         </div>
       </div>
     </footer>

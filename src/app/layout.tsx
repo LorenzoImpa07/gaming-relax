@@ -4,6 +4,7 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { CookieConsent } from "@/components/CookieConsent";
 import { CartProvider } from "@/context/CartContext";
+import { AuthProvider } from "@/context/AuthContext";
 
 export const metadata: Metadata = {
   title: "Gaming Relax | Sviluppo Software, Bot Discord & Applicazioni",
@@ -36,12 +37,14 @@ export default function RootLayout({
   return (
     <html lang="it" className="dark">
       <body className="min-h-screen bg-[#0a0a0f] text-zinc-100 antialiased">
-        <CartProvider>
-          <Navbar />
-          <main className="pt-20">{children}</main>
-          <Footer />
-          <CookieConsent />
-        </CartProvider>
+        <AuthProvider>
+          <CartProvider>
+            <Navbar />
+            <main className="pt-20">{children}</main>
+            <Footer />
+            <CookieConsent />
+          </CartProvider>
+        </AuthProvider>
       </body>
     </html>
   );

@@ -2,20 +2,37 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { LogIn, Mail, Lock } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const { login } = useAuth();
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 1000));
-    alert("Login demo: in seguito collegheremo l'autenticazione reale con Firebase.");
-    setLoading(false);
+    try {
+      await login(email, password);
+      router.push("/");
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error ? err.message : "Errore durante l'accesso";
+      if (message.includes("user-not-found") || message.includes("wrong-password") || message.includes("invalid-credential")) {
+        setError("Email o password non corretti");
+      } else {
+        setError("Errore durante l'accesso. Riprova.");
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -34,6 +51,12 @@ export default function LoginPage() {
             Accedi al tuo account Gaming Relax
           </p>
         </div>
+
+        {error && (
+          <div className="mb-4 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+            {error}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>

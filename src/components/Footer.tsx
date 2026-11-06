@@ -27,52 +27,22 @@ export function Footer() {
           <div>
             <h4 className="mb-4 text-sm font-semibold text-white">Navigazione</h4>
             <ul className="space-y-2 text-sm text-zinc-400">
-              <li>
-                <Link href="/#servizi" className="hover:text-violet-400 transition-colors">
-                  Servizi
-                </Link>
-              </li>
-              <li>
-                <Link href="/#progetti" className="hover:text-violet-400 transition-colors">
-                  Progetti
-                </Link>
-              </li>
-              <li>
-                <Link href="/#team" className="hover:text-violet-400 transition-colors">
-                  Team
-                </Link>
-              </li>
-              <li>
-                <Link href="/#chi-siamo" className="hover:text-violet-400 transition-colors">
-                  Chi siamo
-                </Link>
-              </li>
-              <li>
-                <Link href="/contatti" className="hover:text-violet-400 transition-colors">
-                  Contatti
-                </Link>
-              </li>
+              <li><Link href="/#servizi" className="hover:text-violet-400 transition-colors">Servizi</Link></li>
+              <li><Link href="/store" className="hover:text-violet-400 transition-colors">Store</Link></li>
+              <li><Link href="/#progetti" className="hover:text-violet-400 transition-colors">Progetti</Link></li>
+              <li><Link href="/#team" className="hover:text-violet-400 transition-colors">Team</Link></li>
+              <li><Link href="/contatti" className="hover:text-violet-400 transition-colors">Contatti</Link></li>
+              <li><Link href="/login" className="hover:text-violet-400 transition-colors">Accedi</Link></li>
             </ul>
           </div>
 
           <div>
             <h4 className="mb-4 text-sm font-semibold text-white">Legale & Contatti</h4>
             <ul className="space-y-2 text-sm text-zinc-400">
-              <li>
-                <Link href="/privacy" className="hover:text-violet-400 transition-colors">
-                  Privacy Policy
-                </Link>
-              </li>
-              <li>
-                <Link href="/cookie" className="hover:text-violet-400 transition-colors">
-                  Cookie Policy
-                </Link>
-              </li>
+              <li><Link href="/privacy" className="hover:text-violet-400 transition-colors">Privacy Policy</Link></li>
+              <li><Link href="/cookie" className="hover:text-violet-400 transition-colors">Cookie Policy</Link></li>
               <li className="pt-2">
-                <a
-                  href="mailto:info@gamingrelaxofficials.it"
-                  className="flex items-center gap-2 hover:text-violet-400 transition-colors"
-                >
+                <a href="mailto:info@gamingrelaxofficials.it" className="flex items-center gap-2 hover:text-violet-400 transition-colors">
                   <Mail size={14} />
                   info@gamingrelaxofficials.it
                 </a>

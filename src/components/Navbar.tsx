@@ -3,19 +3,21 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
-import { Menu, X } from "lucide-react";
+import { Menu, X, ShoppingCart, User } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useCart } from "@/context/CartContext";
 
 const navLinks = [
   { href: "/#servizi", label: "Servizi" },
+  { href: "/store", label: "Store" },
   { href: "/#progetti", label: "Progetti" },
   { href: "/#team", label: "Team" },
-  { href: "/#chi-siamo", label: "Chi siamo" },
   { href: "/contatti", label: "Contatti" },
 ];
 
 export function Navbar() {
   const [open, setOpen] = useState(false);
+  const { count } = useCart();
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 border-b border-zinc-800/80 bg-[#0a0a0f]/90 backdrop-blur-md">
@@ -34,7 +36,7 @@ export function Navbar() {
           </span>
         </Link>
 
-        <nav className="hidden md:flex items-center gap-7">
+        <nav className="hidden md:flex items-center gap-6">
           {navLinks.map((link) => (
             <Link
               key={link.href}
@@ -44,6 +46,28 @@ export function Navbar() {
               {link.label}
             </Link>
           ))}
+
+          <Link
+            href="/carrello"
+            className="relative p-2 text-zinc-400 hover:text-white transition-colors"
+            aria-label="Carrello"
+          >
+            <ShoppingCart className="h-5 w-5" />
+            {count > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-violet-500 text-[10px] font-bold text-white">
+                {count}
+              </span>
+            )}
+          </Link>
+
+          <Link
+            href="/login"
+            className="flex items-center gap-1.5 text-sm font-medium text-zinc-400 hover:text-white transition-colors"
+          >
+            <User className="h-4 w-4" />
+            Accedi
+          </Link>
+
           <Link
             href="/contatti"
             className="rounded-full bg-gradient-to-r from-violet-600 to-cyan-500 px-5 py-2 text-sm font-semibold text-white shadow-lg shadow-violet-500/25 hover:shadow-violet-500/40 transition-all hover:scale-105"
@@ -52,13 +76,23 @@ export function Navbar() {
           </Link>
         </nav>
 
-        <button
-          className="md:hidden p-2 text-zinc-400 hover:text-white"
-          onClick={() => setOpen(!open)}
-          aria-label="Menu"
-        >
-          {open ? <X size={24} /> : <Menu size={24} />}
-        </button>
+        <div className="flex items-center gap-2 md:hidden">
+          <Link href="/carrello" className="relative p-2 text-zinc-400">
+            <ShoppingCart className="h-5 w-5" />
+            {count > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-violet-500 text-[10px] font-bold text-white">
+                {count}
+              </span>
+            )}
+          </Link>
+          <button
+            className="p-2 text-zinc-400 hover:text-white"
+            onClick={() => setOpen(!open)}
+            aria-label="Menu"
+          >
+            {open ? <X size={24} /> : <Menu size={24} />}
+          </button>
+        </div>
       </div>
 
       <div
@@ -78,6 +112,13 @@ export function Navbar() {
               {link.label}
             </Link>
           ))}
+          <Link
+            href="/login"
+            onClick={() => setOpen(false)}
+            className="rounded-lg px-4 py-3 text-zinc-300 hover:bg-zinc-900 hover:text-white transition-colors"
+          >
+            Accedi / Registrati
+          </Link>
           <Link
             href="/contatti"
             onClick={() => setOpen(false)}

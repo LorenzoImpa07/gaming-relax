@@ -68,7 +68,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const clearCart = () => setItems([]);
 
-  const total = items.reduce((sum, i) => sum + i.service.price * i.quantity, 0);
+  const total = items.reduce((sum, i) => {
+    const disc = i.service.discountPercent || 0;
+    const unit = disc > 0 ? i.service.price * (1 - disc / 100) : i.service.price;
+    return sum + unit * i.quantity;
+  }, 0);
   const count = items.reduce((sum, i) => sum + i.quantity, 0);
 
   return (

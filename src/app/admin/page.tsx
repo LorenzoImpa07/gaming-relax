@@ -38,7 +38,7 @@ export default function AdminOverviewPage() {
   return (
     <div>
       <p className="text-zinc-400 text-sm mb-6">
-        Panoramica rapida. Usa i tab sopra per gestire ordini, recensioni e messaggi.
+        Panoramica rapida. Usa i tab sopra per gestire ordini, recensioni, messaggi e contenuti.
       </p>
       <div className="grid gap-4 sm:grid-cols-3">
         {cards.map((c) => (
@@ -54,15 +54,6 @@ export default function AdminOverviewPage() {
             <p className="text-sm text-zinc-400">{c.label}</p>
           </Link>
         ))}
-      </div>
-
-      <div className="mt-10 rounded-2xl border border-zinc-800 bg-zinc-900/30 p-5 text-sm text-zinc-400">
-        <p className="font-medium text-zinc-200 mb-2">Accesso admin</p>
-        <p>
-          Solo l&apos;account <span className="text-violet-300">gamingrelaxadmin@gmail.com</span> può
-          entrare qui. Registrati / accedi con quella email, poi apri{" "}
-          <code className="text-zinc-300">/admin</code>.
-        </p>
       </div>
     </div>
   );

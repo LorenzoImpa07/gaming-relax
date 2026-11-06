@@ -2,6 +2,7 @@ export type ForumCategory = {
   id: string;
   name: string;
   order: number;
+  color?: string;
 };
 
 export type ForumChannel = {
@@ -39,3 +40,14 @@ export type ForumPost = {
   authorName: string;
   createdAt?: unknown;
 };
+
+export const CATEGORY_COLOR_PRESETS = [
+  { label: "Verde", value: "#34d399" },
+  { label: "Viola", value: "#a78bfa" },
+  { label: "Rosa", value: "#f472b6" },
+  { label: "Blu", value: "#60a5fa" },
+  { label: "Ciano", value: "#22d3ee" },
+  { label: "Ambra", value: "#fbbf24" },
+  { label: "Rosso", value: "#f87171" },
+  { label: "Arancio", value: "#fb923c" },
+];

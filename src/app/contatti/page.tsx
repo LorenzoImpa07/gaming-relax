@@ -54,10 +54,10 @@ export default function ContattiPage() {
               <h3 className="font-semibold text-white">Email</h3>
             </div>
             <a
-              href="mailto:info@gamingrelaxofficials.it"
+              href="mailto:supporto@gamingrelaxofficials.it"
               className="text-sm text-zinc-400 hover:text-violet-400 transition-colors"
             >
-              info@gamingrelaxofficials.it
+              supporto@gamingrelaxofficials.it
             </a>
           </div>
 

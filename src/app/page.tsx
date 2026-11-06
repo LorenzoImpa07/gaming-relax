@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { Partners } from "@/components/Partners";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import {
@@ -202,9 +203,7 @@ export default function HomePage() {
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <motion.div {...fadeIn} className="text-center mb-16">
             <h2 className="text-3xl font-bold text-white sm:text-4xl">Progetti recenti</h2>
-            <p className="mt-4 text-zinc-400 max-w-2xl mx-auto">
-              Alcuni esempi di lavori realizzati.
-            </p>
+            <p className="mt-4 text-zinc-400 max-w-2xl mx-auto">Alcuni esempi di lavori realizzati.</p>
           </motion.div>
 
           <div className="grid gap-6 sm:grid-cols-2">
@@ -218,17 +217,9 @@ export default function HomePage() {
                 className="rounded-2xl border border-zinc-800 bg-zinc-900/40 overflow-hidden hover:border-zinc-700 transition-colors"
               >
                 <div className="relative h-44 w-full overflow-hidden">
-                  <Image
-                    src={project.image}
-                    alt={project.title}
-                    fill
-                    className="object-cover transition-transform duration-500 hover:scale-105"
-                    sizes="(max-width: 768px) 100vw, 50vw"
-                  />
+                  <Image src={project.image} alt={project.title} fill className="object-cover transition-transform duration-500 hover:scale-105" sizes="(max-width: 768px) 100vw, 50vw" />
                   <div className="absolute inset-0 bg-gradient-to-t from-zinc-900/80 to-transparent" />
-                  <span className="absolute bottom-3 left-4 text-xs font-medium uppercase tracking-wider text-violet-300">
-                    {project.category}
-                  </span>
+                  <span className="absolute bottom-3 left-4 text-xs font-medium uppercase tracking-wider text-violet-300">{project.category}</span>
                 </div>
                 <div className="p-6">
                   <h3 className="mb-2 text-xl font-semibold text-white">{project.title}</h3>
@@ -249,9 +240,7 @@ export default function HomePage() {
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <motion.div {...fadeIn} className="text-center mb-16">
             <h2 className="text-3xl font-bold text-white sm:text-4xl">Il Team</h2>
-            <p className="mt-4 text-zinc-400 max-w-2xl mx-auto">
-              Siamo in due, appassionati di codice e di soluzioni concrete.
-            </p>
+            <p className="mt-4 text-zinc-400 max-w-2xl mx-auto">Siamo in due, appassionati di codice e di soluzioni concrete.</p>
           </motion.div>
 
           <div className="grid gap-8 sm:grid-cols-2 max-w-4xl mx-auto">
@@ -289,14 +278,7 @@ export default function HomePage() {
               "https://images.unsplash.com/photo-1498050108023-c8199c3246c7?w=600&q=80",
               "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=600&q=80",
             ].map((src, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, scale: 0.95 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-zinc-800"
-              >
+              <motion.div key={i} initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }} className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-zinc-800">
                 <Image src={src} alt={`Workspace ${i + 1}`} fill className="object-cover hover:scale-105 transition-transform duration-500" sizes="(max-width: 768px) 50vw, 25vw" />
               </motion.div>
             ))}
@@ -309,9 +291,7 @@ export default function HomePage() {
           <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
             <motion.div {...fadeIn}>
               <h2 className="text-3xl font-bold text-white sm:text-4xl">Chi siamo</h2>
-              <p className="mt-6 text-zinc-400 leading-relaxed">
-                Siamo un team di due sviluppatori appassionati di codice e di soluzioni pratiche.
-              </p>
+              <p className="mt-6 text-zinc-400 leading-relaxed">Siamo un team di due sviluppatori appassionati di codice e di soluzioni pratiche.</p>
               <ul className="mt-8 space-y-3">
                 {["Comunicazione chiara e trasparente", "Codice pulito e documentato", "Tempi di consegna rispettati", "Supporto anche dopo il rilascio"].map((item) => (
                   <li key={item} className="flex items-center gap-3 text-zinc-300">
@@ -327,6 +307,8 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      <Partners />
 
       <section className="py-24 sm:py-32">
         <div className="mx-auto max-w-4xl px-4 sm:px-6 text-center">

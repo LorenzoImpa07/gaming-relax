@@ -43,7 +43,9 @@ export default function ForumPage() {
           </div>
           {!user && (
             <p className="text-sm text-zinc-500">
-              <Link href="/login?next=/forum" className="text-violet-400 hover:underline">Accedi</Link>{" "}
+              <Link href="/login?next=/forum" className="text-violet-400 hover:underline">
+                Accedi
+              </Link>{" "}
               per aprire discussioni e rispondere.
             </p>
           )}
@@ -54,7 +56,7 @@ export default function ForumPage() {
             {loading && <p className="text-sm text-zinc-500">Caricamento forum...</p>}
             {!loading && categories.length === 0 && (
               <div className="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-8 text-center text-zinc-400">
-                Nessuna categoria ancora. L&apos;admin pu\u00f2 crearle da Dashboard \u2192 Forum.
+                Nessuna categoria ancora. L'admin puo crearle da Dashboard - Forum.
               </div>
             )}
             {categories.map((cat) => {
@@ -67,7 +69,10 @@ export default function ForumPage() {
                   className="overflow-hidden rounded-2xl border border-zinc-800/80 bg-zinc-950/80 shadow-xl shadow-black/40"
                 >
                   <div className="flex items-center gap-2 border-b border-zinc-800 bg-zinc-900/60 px-5 py-3">
-                    <span className="h-2 w-2 rounded-full bg-emerald-400" />
+                    <span
+                      className="h-2.5 w-2.5 rounded-full shrink-0"
+                      style={{ backgroundColor: cat.color || "#34d399" }}
+                    />
                     <h2 className="font-semibold text-white">{cat.name}</h2>
                   </div>
                   {catChannels.length === 0 ? (
@@ -77,11 +82,19 @@ export default function ForumPage() {
                       {catChannels.map((ch) => (
                         <li key={ch.id} className="border-b border-zinc-800/80 last:border-0">
                           {ch.type === "link" && ch.externalUrl ? (
-                            <a href={ch.externalUrl} target="_blank" rel="noopener noreferrer" className="flex flex-col gap-1 px-5 py-4 transition-colors hover:bg-zinc-900/80 sm:flex-row sm:items-center sm:justify-between">
+                            <a
+                              href={ch.externalUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex flex-col gap-1 px-5 py-4 transition-colors hover:bg-zinc-900/80 sm:flex-row sm:items-center sm:justify-between"
+                            >
                               <ChannelInfo channel={ch} />
                             </a>
                           ) : (
-                            <Link href={`/forum/${ch.id}`} className="flex flex-col gap-1 px-5 py-4 transition-colors hover:bg-zinc-900/80 sm:flex-row sm:items-center sm:justify-between">
+                            <Link
+                              href={`/forum/${ch.id}`}
+                              className="flex flex-col gap-1 px-5 py-4 transition-colors hover:bg-zinc-900/80 sm:flex-row sm:items-center sm:justify-between"
+                            >
                               <ChannelInfo channel={ch} />
                             </Link>
                           )}
@@ -100,20 +113,30 @@ export default function ForumPage() {
               {user ? (
                 <>
                   <p className="font-semibold text-white">{user.displayName || user.email}</p>
-                  <p className="mt-1 text-sm text-zinc-500">Entra in una sezione per leggere o aprire una conversazione.</p>
+                  <p className="mt-1 text-sm text-zinc-500">
+                    Entra in una sezione per leggere o aprire una conversazione.
+                  </p>
                 </>
               ) : (
                 <>
                   <p className="text-sm text-zinc-400">Non sei loggato.</p>
-                  <Link href="/login?next=/forum" className="mt-3 inline-block text-sm text-violet-400 hover:underline">Accedi ora \u2192</Link>
+                  <Link href="/login?next=/forum" className="mt-3 inline-block text-sm text-violet-400 hover:underline">
+                    Accedi ora
+                  </Link>
                 </>
               )}
             </div>
             <div className="rounded-2xl border border-zinc-800 bg-zinc-950/80 p-5">
               <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500 mb-3">Statistiche forum</p>
               <dl className="space-y-2 text-sm">
-                <div className="flex justify-between"><dt className="text-zinc-500">Categorie</dt><dd className="text-white">{categories.length}</dd></div>
-                <div className="flex justify-between"><dt className="text-zinc-500">Canali</dt><dd className="text-white">{channels.length}</dd></div>
+                <div className="flex justify-between">
+                  <dt className="text-zinc-500">Categorie</dt>
+                  <dd className="text-white">{categories.length}</dd>
+                </div>
+                <div className="flex justify-between">
+                  <dt className="text-zinc-500">Canali</dt>
+                  <dd className="text-white">{channels.length}</dd>
+                </div>
               </dl>
             </div>
           </aside>
@@ -127,13 +150,15 @@ function ChannelInfo({ channel }: { channel: ForumChannel }) {
   return (
     <>
       <div className="flex items-start gap-3 min-w-0">
-        <span className="text-xl leading-none mt-0.5">{channel.icon || "\ud83d\udcac"}</span>
+        <span className="text-xl leading-none mt-0.5">{channel.icon || "#"}</span>
         <div className="min-w-0">
           <p className="font-medium text-white flex items-center gap-2">
             {channel.name}
-            {channel.type === "link" && <span className="text-xs text-zinc-500">\u2197</span>}
+            {channel.type === "link" && <span className="text-xs text-zinc-500">ext</span>}
             {channel.staffOnly && (
-              <span className="rounded bg-amber-500/20 px-1.5 py-0.5 text-[10px] text-amber-300">Solo staff</span>
+              <span className="rounded bg-amber-500/20 px-1.5 py-0.5 text-[10px] text-amber-300">
+                Solo staff
+              </span>
             )}
           </p>
           {channel.description && (

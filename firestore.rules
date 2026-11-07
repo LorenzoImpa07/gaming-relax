@@ -1,0 +1,77 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    match /users/{userId} {
+      allow read: if true;
+      allow create: if request.auth != null && request.auth.uid == userId;
+      allow update: if request.auth != null && request.auth.uid == userId;
+      allow delete: if false;
+    }
+
+    match /verification_codes/{id} {
+      allow read, write: if true;
+    }
+
+    match /site_services/{id} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    match /site_partners/{id} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    match /site_team/{id} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    match /site_news/{id} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    match /site_discounts/{id} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    match /forum_categories/{id} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    match /forum_channels/{id} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    match /forum_threads/{id} {
+      allow read: if true;
+      allow create: if request.auth != null;
+      allow update, delete: if request.auth != null;
+    }
+    match /forum_posts/{id} {
+      allow read: if true;
+      allow create: if request.auth != null;
+      allow update, delete: if request.auth != null;
+    }
+
+    match /orders/{id} {
+      allow read: if request.auth != null;
+      allow create: if true;
+      allow update: if request.auth != null;
+    }
+    match /messages/{id} {
+      allow read: if request.auth != null;
+      allow create: if true;
+      allow update, delete: if request.auth != null;
+    }
+    match /reviews/{id} {
+      allow read: if true;
+      allow create: if true;
+      allow update, delete: if request.auth != null;
+    }
+
+    match /{document=**} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+  }
+}

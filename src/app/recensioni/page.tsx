@@ -111,7 +111,7 @@ export default function RecensioniPage() {
   return (
     <div className="mx-auto max-w-4xl px-4 py-16 sm:px-6 sm:py-24">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-14">
-        <h1 className="text-3xl font-bold text-white sm:text-4xl">Recensioni</h1>
+        <h1 className="text-3xl font-bold text-white sm:text-4xl text-glow">Recensioni</h1>
         <p className="mt-4 text-zinc-400 max-w-xl mx-auto">
           Cosa dicono di noi e spazio per lasciare la tua esperienza.
         </p>
@@ -124,14 +124,16 @@ export default function RecensioniPage() {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.08 }}
-            className="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-5"
+            className="card-shine box-glow-hover rounded-2xl border border-zinc-800 bg-zinc-900/40 p-5"
           >
             <div className="flex gap-0.5 mb-3">
               {Array.from({ length: 5 }).map((_, idx) => (
                 <Star
                   key={idx}
                   className={`h-4 w-4 ${
-                    idx < r.rating ? "fill-violet-400 text-violet-400" : "text-zinc-600"
+                    idx < r.rating
+                      ? "fill-amber-400 text-amber-300 star-glow"
+                      : "text-zinc-700"
                   }`}
                 />
               ))}
@@ -146,17 +148,17 @@ export default function RecensioniPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
-        className="rounded-2xl border border-zinc-800 bg-zinc-950/80 p-6 sm:p-8 shadow-2xl shadow-black/40"
+        className="rounded-2xl border border-zinc-800 bg-zinc-950/80 p-6 sm:p-8 shadow-2xl shadow-violet-500/10 box-glow"
       >
         {done ? (
           <div className="text-center py-10">
             <CheckCircle2 className="mx-auto h-12 w-12 text-green-400 mb-4" />
             <h2 className="text-xl font-semibold text-white mb-2">Recensione inviata!</h2>
             <p className="text-zinc-400 text-sm mb-6">
-              Verrà pubblicata dopo una rapida verifica dello staff.
+              {"Verr\u00e0 pubblicata dopo una rapida verifica dello staff."}
             </p>
             <button onClick={() => setDone(false)} className="text-violet-400 hover:text-violet-300 text-sm">
-              Invia un&apos;altra recensione
+              Invia un'altra recensione
             </button>
           </div>
         ) : (
@@ -168,8 +170,7 @@ export default function RecensioniPage() {
               <div>
                 <h2 className="text-lg font-semibold text-white">Lascia la tua recensione</h2>
                 <p className="text-sm text-zinc-400 mt-1">
-                  Racconta la tua esperienza con Gaming Relax — la tua recensione verrà
-                  pubblicata dopo una rapida verifica dello staff.
+                  {"Racconta la tua esperienza con Gaming Relax \u2014 la tua recensione verr\u00e0 pubblicata dopo una rapida verifica dello staff."}
                 </p>
               </div>
             </div>
@@ -221,7 +222,7 @@ export default function RecensioniPage() {
                 <label className="block text-xs font-semibold uppercase tracking-wider text-zinc-500 mb-2">
                   Valutazione
                 </label>
-                <div className="inline-flex items-center gap-1 rounded-xl border border-zinc-700 bg-zinc-900/50 px-3 py-2">
+                <div className="inline-flex items-center gap-1 rounded-xl border border-amber-500/20 bg-zinc-900/50 px-3 py-2 shadow-[0_0_20px_rgba(251,191,36,0.08)]">
                   {[1, 2, 3, 4, 5].map((star) => (
                     <button
                       key={star}
@@ -229,19 +230,19 @@ export default function RecensioniPage() {
                       onClick={() => setRating(star)}
                       onMouseEnter={() => setHoverRating(star)}
                       onMouseLeave={() => setHoverRating(0)}
-                      className="p-0.5 transition-transform hover:scale-110"
+                      className="p-0.5 transition-transform hover:scale-125"
                       aria-label={`${star} stelle`}
                     >
                       <Star
-                        className={`h-6 w-6 transition-colors ${
+                        className={`h-7 w-7 transition-all duration-200 ${
                           star <= displayRating
-                            ? "fill-violet-400 text-violet-400"
-                            : "text-zinc-600"
+                            ? "fill-amber-400 text-amber-300 star-glow scale-105"
+                            : "text-zinc-600 hover:text-zinc-400"
                         }`}
                       />
                     </button>
                   ))}
-                  <span className="ml-2 text-sm font-medium text-zinc-300 border-l border-zinc-700 pl-3">
+                  <span className="ml-2 text-sm font-medium text-amber-100/90 border-l border-zinc-700 pl-3">
                     {ratingLabels[displayRating] || "Seleziona"}
                   </span>
                 </div>
@@ -272,13 +273,13 @@ export default function RecensioniPage() {
                   onChange={handlePhoto}
                   className="block w-full text-sm text-zinc-400 file:mr-4 file:rounded-lg file:border-0 file:bg-zinc-800 file:px-4 file:py-2 file:text-sm file:font-medium file:text-zinc-200 hover:file:bg-zinc-700"
                 />
-                <p className="mt-1.5 text-xs text-zinc-600">JPG, PNG o WebP — max 5MB</p>
+                <p className="mt-1.5 text-xs text-zinc-600">JPG, PNG o WebP \u2014 max 5MB</p>
               </div>
 
               <button
                 type="submit"
                 disabled={loading}
-                className="rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-500 px-8 py-3 text-sm font-semibold text-white shadow-lg shadow-violet-500/25 disabled:opacity-60"
+                className="rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-500 px-8 py-3 text-sm font-semibold text-white btn-glow disabled:opacity-60"
               >
                 {loading ? "Invio in corso..." : "Invia recensione"}
               </button>

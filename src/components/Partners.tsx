@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Image from "next/image";
 import { motion } from "framer-motion";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "@/lib/firebase";
@@ -25,6 +24,7 @@ function isValidImageSrc(src: string | undefined | null): boolean {
   const s = src.trim();
   if (!s) return false;
   if (s.startsWith("/")) return true;
+  if (s.startsWith("data:image/")) return true;
   try {
     const u = new URL(s);
     return u.protocol === "http:" || u.protocol === "https:";
@@ -79,12 +79,15 @@ export function Partners() {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
+          className="mb-12"
         >
           <h2 className="text-3xl font-bold text-white sm:text-4xl">I nostri partner</h2>
-          <p className="mt-3 text-zinc-400">I brand e gli studi con cui collaboriamo.</p>
+          <p className="mt-3 text-zinc-400 max-w-xl mx-auto text-sm sm:text-base">
+            Collaborazioni e realta con cui lavoriamo fianco a fianco.
+          </p>
         </motion.div>
 
-        <div className="mt-12 flex flex-wrap items-center justify-center gap-6">
+        <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-10">
           {partners.map((partner, i) => (
             <motion.a
               key={partner.id}
@@ -94,17 +97,22 @@ export function Partners() {
               initial={{ opacity: 0, scale: 0.9 }}
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
-              transition={{ delay: i * 0.1 }}
-              className="group relative flex h-28 w-28 sm:h-32 sm:w-32 items-center justify-center rounded-2xl border border-zinc-700/80 bg-zinc-900/60 p-3 shadow-lg shadow-black/30 transition-all hover:border-violet-500/50 hover:bg-zinc-900 hover:scale-105"
-              title={partner.name}
+              transition={{ delay: i * 0.05 }}
+              className="group flex flex-col items-center gap-3"
             >
-              <Image
-                src={partner.image}
-                alt={partner.name}
-                width={120}
-                height={120}
-                className="rounded-xl object-cover w-full h-full"
-              />
+              <div className="relative h-[120px] w-[120px] overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900/50 transition-all group-hover:border-violet-500/40 group-hover:shadow-[0_0_24px_rgba(139,92,246,0.25)]">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={partner.image}
+                  alt={partner.name}
+                  width={120}
+                  height={120}
+                  className="h-full w-full rounded-xl object-cover"
+                />
+              </div>
+              <span className="text-sm text-zinc-400 group-hover:text-violet-300 transition-colors">
+                {partner.name}
+              </span>
             </motion.a>
           ))}
         </div>

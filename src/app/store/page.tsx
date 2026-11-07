@@ -67,14 +67,14 @@ export default function StorePage() {
   return (
     <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-24">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-12">
-        <h1 className="text-3xl font-bold text-white sm:text-4xl">Store Servizi</h1>
+        <h1 className="text-3xl font-bold text-white sm:text-4xl text-glow">Store Servizi</h1>
         <p className="mt-4 text-zinc-400 max-w-2xl mx-auto">
           {"Scegli il pacchetto pi\u00f9 adatto. Prezzi trasparenti e supporto incluso."}
         </p>
       </motion.div>
 
       <div className="grid gap-8 lg:grid-cols-[240px_1fr]">
-        <aside className="h-fit rounded-2xl border border-zinc-800 bg-zinc-900/50 p-5 space-y-6 sticky top-24">
+        <aside className="h-fit rounded-2xl border border-zinc-800 bg-zinc-900/50 p-5 space-y-6 sticky top-24 box-glow">
           <div>
             <p className="text-xs font-semibold uppercase tracking-wider text-fuchsia-400 mb-3">
               {"Disponibilit\u00e0"}
@@ -128,14 +128,14 @@ export default function StorePage() {
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.05 }}
-              className={`relative rounded-2xl border p-6 flex flex-col ${
+              className={`relative card-shine box-glow-hover rounded-2xl border p-6 flex flex-col ${
                 service.popular
-                  ? "border-violet-500/50 bg-violet-500/5"
+                  ? "border-violet-500/50 bg-violet-500/5 box-glow"
                   : "border-zinc-800 bg-zinc-900/40"
               }`}
             >
               {service.popular && (
-                <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-gradient-to-r from-violet-600 to-cyan-500 px-3 py-0.5 text-xs font-semibold text-white">
+                <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-gradient-to-r from-violet-600 to-cyan-500 px-3 py-0.5 text-xs font-semibold text-white btn-glow">
                   {"Pi\u00f9 richiesto"}
                 </span>
               )}
@@ -189,7 +189,7 @@ export default function StorePage() {
                 <button
                   disabled={service.available === false}
                   onClick={() => addItem(service)}
-                  className="w-full inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-violet-600 to-cyan-500 px-5 py-3 text-sm font-semibold text-white disabled:opacity-40"
+                  className="w-full inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-violet-600 to-cyan-500 px-5 py-3 text-sm font-semibold text-white disabled:opacity-40 btn-glow"
                 >
                   <ShoppingCart className="h-4 w-4" />
                   Aggiungi al carrello

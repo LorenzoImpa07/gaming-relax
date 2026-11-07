@@ -1,7 +1,6 @@
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
-import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBa2zLaeU_DD6pKO62guRUD4Ijd8RkYOJc",
@@ -17,10 +16,5 @@ const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 
 export const auth = getAuth(app);
 export const db = getFirestore(app);
-
-export const storage = getStorage(
-  app,
-  "gs://gaming-relax-programmazione.firebasestorage.app"
-);
-
+// Storage non usato sul piano free: le foto vengono salvate come data URL in Firestore
 export default app;

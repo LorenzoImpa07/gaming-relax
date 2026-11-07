@@ -1,97 +1,73 @@
-import {
-  ref,
-  uploadBytes,
-  uploadBytesResumable,
-  getDownloadURL,
-} from "firebase/storage";
-import { auth, storage } from "@/lib/firebase";
+/**
+ * Upload immagini SENZA Firebase Storage (piano Spark / free).
+ * Comprime lato client e restituisce un data URL (base64) da salvare su Firestore.
+ */
 
 export type UploadProgress = {
   percent: number;
   state: "running" | "success" | "error";
 };
 
-async function compressImage(file: File, maxSize = 1280, quality = 0.8): Promise<Blob> {
-  if (!file.type.startsWith("image/")) {
-    throw new Error("Seleziona un file immagine (JPG, PNG, WebP)");
-  }
-  if (file.size > 10 * 1024 * 1024) {
-    throw new Error("Immagine troppo grande (max 10MB)");
-  }
-
-  if (file.type === "image/gif" || file.size < 150_000) {
-    return file;
-  }
-
-  try {
-    const bitmap = await createImageBitmap(file);
-    const scale = Math.min(1, maxSize / Math.max(bitmap.width, bitmap.height));
-    const w = Math.max(1, Math.round(bitmap.width * scale));
-    const h = Math.max(1, Math.round(bitmap.height * scale));
-    const canvas = document.createElement("canvas");
-    canvas.width = w;
-    canvas.height = h;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) {
-      bitmap.close();
-      return file;
-    }
-    ctx.drawImage(bitmap, 0, 0, w, h);
-    bitmap.close();
-    const blob: Blob | null = await new Promise((resolve) =>
-      canvas.toBlob((b) => resolve(b), "image/jpeg", quality)
-    );
-    return blob || file;
-  } catch {
-    return file;
-  }
+function loadImage(file: File): Promise<HTMLImageElement> {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      resolve(img);
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error("Impossibile leggere l'immagine"));
+    };
+    img.src = url;
+  });
 }
 
-function friendlyStorageError(err: unknown): string {
-  const code =
-    err && typeof err === "object" && "code" in err
-      ? String((err as { code: string }).code)
-      : "";
-  const msg = err instanceof Error ? err.message : String(err || "");
+async function compressToDataUrl(
+  file: File,
+  maxSide: number,
+  quality: number
+): Promise<string> {
+  const img = await loadImage(file);
+  const scale = Math.min(1, maxSide / Math.max(img.width, img.height));
+  const w = Math.max(1, Math.round(img.width * scale));
+  const h = Math.max(1, Math.round(img.height * scale));
 
-  if (
-    code.includes("unauthorized") ||
-    code.includes("permission-denied") ||
-    msg.toLowerCase().includes("permission") ||
-    msg.toLowerCase().includes("unauthorized")
-  ) {
-    return (
-      "Upload bloccato: regole Firebase Storage o utente non loggato. " +
-      "1) Accedi al sito. " +
-      "2) Firebase Console → Storage → Rules → pubblica: " +
-      "allow read: if true; allow write: if request.auth != null;"
+  const canvas = document.createElement("canvas");
+  canvas.width = w;
+  canvas.height = h;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) throw new Error("Canvas non supportato dal browser");
+  ctx.drawImage(img, 0, 0, w, h);
+
+  let dataUrl = canvas.toDataURL("image/jpeg", quality);
+
+  let q = quality;
+  let side = maxSide;
+  let guard = 0;
+  while (dataUrl.length > 700_000 && guard < 6) {
+    guard++;
+    q = Math.max(0.45, q - 0.1);
+    side = Math.max(320, Math.round(side * 0.75));
+    const s = Math.min(1, side / Math.max(img.width, img.height));
+    canvas.width = Math.max(1, Math.round(img.width * s));
+    canvas.height = Math.max(1, Math.round(img.height * s));
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    dataUrl = canvas.toDataURL("image/jpeg", q);
+  }
+
+  if (dataUrl.length > 900_000) {
+    throw new Error(
+      "Immagine troppo pesante anche dopo la compressione. Prova una foto piu piccola."
     );
   }
-  if (code.includes("unauthenticated") || msg.includes("unauthenticated")) {
-    return "Devi effettuare l'accesso prima di caricare una foto.";
-  }
-  if (code.includes("canceled") || msg.toLowerCase().includes("timeout")) {
-    return (
-      "Upload interrotto (timeout). Controlla: Storage attivo in Firebase, " +
-      "regole pubblicate, connessione stabile. Poi riprova."
-    );
-  }
-  if (
-    code.includes("retry-limit") ||
-    msg.includes("network") ||
-    msg.includes("Failed to fetch")
-  ) {
-    return "Errore di rete durante l'upload. Riprova tra poco.";
-  }
-  if (code.includes("object-not-found")) {
-    return "File non trovato dopo l'upload. Riprova.";
-  }
-  return msg || "Errore durante il caricamento dell'immagine";
+  return dataUrl;
 }
 
 export function uploadImage(
   file: File,
-  folder: string,
+  _folder: string,
   onProgress?: (p: UploadProgress) => void
 ): Promise<string> {
   return new Promise(async (resolve, reject) => {
@@ -100,96 +76,26 @@ export function uploadImage(
         reject(new Error("Seleziona un file immagine (JPG, PNG, WebP)"));
         return;
       }
-
-      if (!auth.currentUser) {
-        reject(new Error("Devi effettuare l'accesso prima di caricare una foto."));
-        return;
-      }
-
-      onProgress?.({ percent: 5, state: "running" });
-      const blob = await compressImage(file);
-      onProgress?.({ percent: 20, state: "running" });
-
-      const ext =
-        blob.type === "image/jpeg"
-          ? "jpg"
-          : (file.name.split(".").pop() || "jpg");
-      const safeExt = ext.replace(/[^a-z0-9]/gi, "") || "jpg";
-      const path = `${folder}/${auth.currentUser.uid}_${Date.now()}.${safeExt}`;
-      const storageRef = ref(storage, path);
-      const metadata = {
-        contentType: blob.type || "image/jpeg",
-        cacheControl: "public,max-age=31536000",
-      };
-
-      try {
-        onProgress?.({ percent: 40, state: "running" });
-        const result = await Promise.race([
-          uploadBytes(storageRef, blob, metadata),
-          new Promise<never>((_, rej) =>
-            setTimeout(() => rej(new Error("timeout")), 45000)
-          ),
-        ]);
-        onProgress?.({ percent: 85, state: "running" });
-        const url = await getDownloadURL(result.ref);
-        onProgress?.({ percent: 100, state: "success" });
-        resolve(url);
-        return;
-      } catch (firstErr) {
-        const msg = firstErr instanceof Error ? firstErr.message : "";
-        if (
-          msg.includes("permission") ||
-          msg.includes("unauthorized") ||
-          msg.includes("unauthenticated")
-        ) {
-          reject(new Error(friendlyStorageError(firstErr)));
-          return;
-        }
-      }
-
-      onProgress?.({ percent: 30, state: "running" });
-      const task = uploadBytesResumable(storageRef, blob, metadata);
-      const timeout = setTimeout(() => {
-        try {
-          task.cancel();
-        } catch {
-          /* ignore */
-        }
+      if (file.size > 12 * 1024 * 1024) {
         reject(
-          new Error(
-            "Upload troppo lento (timeout 60s). Verifica Storage Rules e che Storage sia attivo nel progetto Firebase."
-          )
+          new Error("File troppo grande (max 12MB). Scegli una foto piu leggera.")
         );
-      }, 60000);
+        return;
+      }
 
-      task.on(
-        "state_changed",
-        (snap) => {
-          const pct =
-            30 +
-            Math.round((snap.bytesTransferred / Math.max(snap.totalBytes, 1)) * 65);
-          onProgress?.({ percent: Math.min(95, pct), state: "running" });
-        },
-        (error) => {
-          clearTimeout(timeout);
-          onProgress?.({ percent: 0, state: "error" });
-          reject(new Error(friendlyStorageError(error)));
-        },
-        async () => {
-          clearTimeout(timeout);
-          try {
-            const url = await getDownloadURL(task.snapshot.ref);
-            onProgress?.({ percent: 100, state: "success" });
-            resolve(url);
-          } catch (e) {
-            onProgress?.({ percent: 0, state: "error" });
-            reject(new Error(friendlyStorageError(e)));
-          }
-        }
-      );
+      onProgress?.({ percent: 15, state: "running" });
+      await new Promise((r) => setTimeout(r, 50));
+      onProgress?.({ percent: 40, state: "running" });
+
+      const dataUrl = await compressToDataUrl(file, 900, 0.72);
+
+      onProgress?.({ percent: 90, state: "running" });
+      await new Promise((r) => setTimeout(r, 80));
+      onProgress?.({ percent: 100, state: "success" });
+      resolve(dataUrl);
     } catch (e) {
       onProgress?.({ percent: 0, state: "error" });
-      reject(new Error(friendlyStorageError(e)));
+      reject(e instanceof Error ? e : new Error("Errore compressione immagine"));
     }
   });
 }

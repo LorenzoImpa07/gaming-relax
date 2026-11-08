@@ -23,6 +23,7 @@ import {
   Shield,
   Database,
   BadgeCheck,
+  Tags,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { isAdminEmail } from "@/lib/admin";
@@ -53,6 +54,7 @@ const navGroups = [
       { href: "/admin/partner", label: "Partner", icon: Handshake },
       { href: "/admin/novita", label: "Novità", icon: Megaphone },
       { href: "/admin/forum", label: "Forum", icon: MessagesSquare },
+      { href: "/admin/forum-tags", label: "Tag forum", icon: Tags },
       { href: "/admin/ruoli", label: "Ruoli", icon: BadgeCheck },
     ],
   },

@@ -15,6 +15,7 @@ export type ForumChannel = {
   externalUrl?: string;
   staffOnly: boolean;
   order: number;
+  tags?: string[];
   threadCount?: number;
   messageCount?: number;
 };
@@ -38,6 +39,7 @@ export type ForumPost = {
   content: string;
   authorId: string;
   authorName: string;
+  authorEmail?: string;
   createdAt?: unknown;
 };
 

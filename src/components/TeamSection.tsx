@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { collection, onSnapshot } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import { ArrowRight } from "lucide-react";
 
 type Member = {
   id: string;
@@ -89,10 +91,19 @@ export function TeamSection() {
                   </div>
                 )}
               </div>
-              <div>
+              <div className="min-w-0 flex-1">
                 <h3 className="text-lg font-semibold text-white">{member.name}</h3>
                 <p className="text-sm text-violet-400">{member.role}</p>
-                <p className="mt-2 text-sm leading-relaxed text-zinc-400">{member.description}</p>
+                <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-zinc-400">
+                  {member.description}
+                </p>
+                <Link
+                  href={`/team/${member.id}`}
+                  className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-violet-400 transition hover:text-violet-300"
+                >
+                  Vedi dettaglio
+                  <ArrowRight className="h-3.5 w-3.5" />
+                </Link>
               </div>
             </motion.div>
           ))}

@@ -25,7 +25,7 @@ const fallback: Member[] = [
     id: "2",
     name: "Team",
     role: "Developer",
-    description: "Aggiungi i membri del team dalla dashboard admin.",
+    description: "Membro del team Gaming Relax.",
   },
 ];
 
@@ -65,7 +65,7 @@ export function TeamSection() {
         >
           <h2 className="text-3xl font-bold text-white sm:text-4xl text-glow">Il Team</h2>
           <p className="mx-auto mt-4 max-w-2xl text-zinc-400">
-            Le persone dietro Gaming Relax. Aggiornato in tempo reale dalla dashboard.
+            Le persone dietro Gaming Relax.
           </p>
         </motion.div>
 

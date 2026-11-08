@@ -81,7 +81,7 @@ export function Partners() {
         >
           <h2 className="text-3xl font-bold text-white sm:text-4xl">I nostri partner</h2>
           <p className="mx-auto mt-3 max-w-xl text-sm text-zinc-400 sm:text-base">
-            Collaborazioni aggiornate in tempo reale dalla dashboard.
+            I brand e gli studi con cui collaboriamo.
           </p>
         </motion.div>
 

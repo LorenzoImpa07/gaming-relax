@@ -11,7 +11,16 @@ import {
   orderBy,
   query,
 } from "firebase/firestore";
+import { Plus, Trash2 } from "lucide-react";
 import { db } from "@/lib/firebase";
+
+type PlanRow = {
+  id: string;
+  name: string;
+  price: number;
+  description: string;
+  features: string;
+};
 
 type ServiceRow = {
   id: string;
@@ -24,7 +33,16 @@ type ServiceRow = {
   popular?: boolean;
   available?: boolean;
   discountPercent?: number;
+  plans?: PlanRow[];
 };
+
+const emptyPlan = (): PlanRow => ({
+  id: `p-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+  name: "",
+  price: 0,
+  description: "",
+  features: "",
+});
 
 const empty = {
   name: "",
@@ -36,7 +54,21 @@ const empty = {
   popular: false,
   available: true,
   discountPercent: 0,
+  plans: [] as PlanRow[],
 };
+
+function parsePlans(raw: unknown): PlanRow[] {
+  if (!Array.isArray(raw)) return [];
+  return raw.map((p: Record<string, unknown>, i: number) => ({
+    id: String(p.id || `plan-${i}`),
+    name: String(p.name || ""),
+    price: Number(p.price) || 0,
+    description: String(p.description || ""),
+    features: Array.isArray(p.features)
+      ? (p.features as string[]).join("\n")
+      : String(p.features || ""),
+  }));
+}
 
 export default function AdminServiziPage() {
   const [items, setItems] = useState<ServiceRow[]>([]);
@@ -48,7 +80,22 @@ export default function AdminServiziPage() {
     setLoading(true);
     try {
       const snap = await getDocs(query(collection(db, "site_services"), orderBy("price")));
-      setItems(snap.docs.map((d) => ({ id: d.id, ...d.data() } as ServiceRow)));
+      setItems(
+        snap.docs.map((d) => {
+          const data = d.data();
+          return {
+            id: d.id,
+            ...data,
+            features:
+              typeof data.features === "string"
+                ? data.features
+                : Array.isArray(data.features)
+                  ? data.features.join("\n")
+                  : "",
+            plans: parsePlans(data.plans),
+          } as ServiceRow;
+        })
+      );
     } catch (e) {
       console.error(e);
     } finally {
@@ -62,6 +109,20 @@ export default function AdminServiziPage() {
 
   const save = async (e: React.FormEvent) => {
     e.preventDefault();
+    const plans = (form.plans || [])
+      .filter((p) => p.name.trim())
+      .map((p) => ({
+        id: p.id || `p-${Date.now()}`,
+        name: p.name.trim(),
+        price: Number(p.price) || 0,
+        description: p.description?.trim() || "",
+        features: p.features
+          .split("\n")
+          .map((s) => s.trim())
+          .filter(Boolean),
+      }))
+      .sort((a, b) => a.price - b.price);
+
     const payload = {
       name: form.name,
       description: form.description,
@@ -72,6 +133,7 @@ export default function AdminServiziPage() {
       popular: !!form.popular,
       available: !!form.available,
       discountPercent: Math.min(100, Math.max(0, Number(form.discountPercent) || 0)),
+      plans,
     };
     if (editId) await updateDoc(doc(db, "site_services", editId), payload);
     else await addDoc(collection(db, "site_services"), payload);
@@ -95,6 +157,7 @@ export default function AdminServiziPage() {
       popular: !!row.popular,
       available: row.available !== false,
       discountPercent: row.discountPercent || 0,
+      plans: parsePlans(row.plans),
     });
   };
 
@@ -102,6 +165,12 @@ export default function AdminServiziPage() {
     if (!confirm("Eliminare questo servizio?")) return;
     await deleteDoc(doc(db, "site_services", id));
     load();
+  };
+
+  const updatePlan = (idx: number, patch: Partial<PlanRow>) => {
+    const plans = [...(form.plans || [])];
+    plans[idx] = { ...plans[idx], ...patch };
+    setForm({ ...form, plans });
   };
 
   const field =
@@ -137,13 +206,14 @@ export default function AdminServiziPage() {
         />
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="mb-1 block text-xs text-zinc-500">Prezzo (€)</label>
+            <label className="mb-1 block text-xs text-zinc-500">
+              Prezzo base (€) — se non usi piani
+            </label>
             <input
               type="number"
               required
               min={0}
               step={1}
-              placeholder="Prezzo"
               value={form.price || ""}
               onChange={(e) => setForm({ ...form, price: Number(e.target.value) })}
               className={field}
@@ -155,7 +225,6 @@ export default function AdminServiziPage() {
               type="number"
               min={0}
               max={100}
-              placeholder="0"
               value={form.discountPercent || ""}
               onChange={(e) =>
                 setForm({ ...form, discountPercent: Number(e.target.value) })
@@ -176,12 +245,90 @@ export default function AdminServiziPage() {
           <option value="support">support</option>
         </select>
         <textarea
-          placeholder="Feature (una per riga)"
+          placeholder="Feature base (una per riga)"
           value={form.features}
           onChange={(e) => setForm({ ...form, features: e.target.value })}
           className={field}
-          rows={4}
+          rows={3}
         />
+
+        <div className="rounded-xl border border-zinc-700/80 bg-zinc-950/50 p-4">
+          <div className="mb-3 flex items-center justify-between">
+            <div>
+              <p className="text-sm font-semibold text-white">Piani / abbonamenti</p>
+              <p className="text-[11px] text-zinc-500">
+                Dal più economico al più costoso. Visibili nel dettaglio prodotto.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() =>
+                setForm({ ...form, plans: [...(form.plans || []), emptyPlan()] })
+              }
+              className="inline-flex items-center gap-1 rounded-full border border-violet-500/40 px-3 py-1 text-xs text-violet-300 hover:bg-violet-500/10"
+            >
+              <Plus className="h-3.5 w-3.5" />
+              Aggiungi piano
+            </button>
+          </div>
+          <div className="space-y-4">
+            {(form.plans || []).map((plan, idx) => (
+              <div
+                key={plan.id}
+                className="space-y-2 rounded-lg border border-zinc-800 bg-zinc-900/60 p-3"
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-xs font-medium text-zinc-400">Piano {idx + 1}</span>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setForm({
+                        ...form,
+                        plans: form.plans.filter((_, i) => i !== idx),
+                      })
+                    }
+                    className="text-zinc-500 hover:text-red-400"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </div>
+                <input
+                  placeholder="Nome piano (es. Base, Pro, Premium)"
+                  value={plan.name}
+                  onChange={(e) => updatePlan(idx, { name: e.target.value })}
+                  className={field}
+                />
+                <input
+                  type="number"
+                  min={0}
+                  placeholder="Prezzo €"
+                  value={plan.price || ""}
+                  onChange={(e) => updatePlan(idx, { price: Number(e.target.value) })}
+                  className={field}
+                />
+                <input
+                  placeholder="Descrizione breve del piano"
+                  value={plan.description}
+                  onChange={(e) => updatePlan(idx, { description: e.target.value })}
+                  className={field}
+                />
+                <textarea
+                  placeholder="Feature del piano (una per riga)"
+                  value={plan.features}
+                  onChange={(e) => updatePlan(idx, { features: e.target.value })}
+                  className={field}
+                  rows={2}
+                />
+              </div>
+            ))}
+            {(form.plans || []).length === 0 && (
+              <p className="text-xs text-zinc-600">
+                Nessun piano: nello store si usa solo il prezzo base.
+              </p>
+            )}
+          </div>
+        </div>
+
         <label className="flex items-center gap-2 text-sm text-zinc-300">
           <input
             type="checkbox"
@@ -225,25 +372,22 @@ export default function AdminServiziPage() {
       <div className="space-y-3">
         {loading && <p className="text-sm text-zinc-500">Caricamento...</p>}
         {!loading && items.length === 0 && (
-          <p className="text-sm text-zinc-500">
-            Nessun servizio in Firestore. Aggiungine uno dalla form a sinistra.
-          </p>
+          <p className="text-sm text-zinc-500">Nessun servizio in Firestore.</p>
         )}
         {items.map((row) => {
           const disc = row.discountPercent || 0;
           const final =
             disc > 0 ? Math.round(row.price * (1 - disc / 100) * 100) / 100 : row.price;
+          const planCount = Array.isArray(row.plans) ? row.plans.length : 0;
           return (
             <div key={row.id} className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-4">
               <div className="flex justify-between gap-2">
                 <div>
                   <p className="font-medium text-white">
-                    {row.name} —{" "}
-                    {disc > 0 ? (
+                    {row.name} — {disc > 0 ? (
                       <>
                         <span className="mr-1 text-zinc-500 line-through">€{row.price}</span>
                         <span className="text-fuchsia-400">€{final}</span>
-                        <span className="ml-1 text-xs text-green-400">-{disc}%</span>
                       </>
                     ) : (
                       <>€{row.price}</>
@@ -253,6 +397,7 @@ export default function AdminServiziPage() {
                     {row.category}
                     {row.popular ? " · Più richiesto" : ""}
                     {row.available === false ? " · ESAURITO" : " · disponibile"}
+                    {planCount > 0 ? ` · ${planCount} piani` : ""}
                   </p>
                 </div>
                 <div className="flex flex-wrap items-center gap-2">

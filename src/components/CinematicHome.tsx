@@ -92,22 +92,23 @@ export function CinematicHome() {
   const heroY = useTransform(heroProgress, [0, 1], [0, 100]);
   const heroTitleY = useTransform(heroProgress, [0, 1], [0, -60]);
 
-  const s2Opacity = useTransform(s2, [0.1, 0.3, 0.7, 0.9], [0, 1, 1, 0.2]);
+  const s2Opacity = useTransform(s2, [0.1, 0.3, 0.7, 0.9], [0.35, 1, 1, 0.45]);
   const s2Scale = useTransform(s2, [0, 0.5, 1], [1.08, 1, 1.04]);
   const s2TextY = useTransform(s2, [0.2, 0.5], [40, 0]);
 
-  const s3Opacity = useTransform(s3, [0.1, 0.3, 0.7, 0.9], [0, 1, 1, 0.2]);
+  const s3Opacity = useTransform(s3, [0.1, 0.3, 0.7, 0.9], [0.35, 1, 1, 0.45]);
   const s3Scale = useTransform(s3, [0, 0.5, 1], [1.1, 1, 1.03]);
 
-  const s4Opacity = useTransform(s4, [0.1, 0.3, 0.7, 0.9], [0, 1, 1, 0.3]);
+  const s4Opacity = useTransform(s4, [0.1, 0.3, 0.7, 0.9], [0.35, 1, 1, 0.5]);
   const s4Scale = useTransform(s4, [0, 0.5, 1], [1.06, 1, 1.05]);
 
-  const c1 = useTransform(servicesProgress, [0, 0.2, 0.35, 0.5], [0, 1, 1, 0]);
-  const c2 = useTransform(servicesProgress, [0.25, 0.4, 0.55, 0.7], [0, 1, 1, 0]);
-  const c3 = useTransform(servicesProgress, [0.5, 0.65, 0.8, 1], [0, 1, 1, 1]);
-  const y1 = useTransform(servicesProgress, [0, 0.35], [50, 0]);
-  const y2 = useTransform(servicesProgress, [0.25, 0.55], [50, 0]);
-  const y3 = useTransform(servicesProgress, [0.5, 0.8], [50, 0]);
+  // Opacità minima alta: su mobile le card non devono sparire
+  const c1 = useTransform(servicesProgress, [0, 0.12, 0.35, 0.55], [0.7, 1, 1, 0.95]);
+  const c2 = useTransform(servicesProgress, [0.15, 0.3, 0.5, 0.7], [0.7, 1, 1, 0.95]);
+  const c3 = useTransform(servicesProgress, [0.35, 0.5, 0.7, 1], [0.7, 1, 1, 1]);
+  const y1 = useTransform(servicesProgress, [0, 0.3], [24, 0]);
+  const y2 = useTransform(servicesProgress, [0.15, 0.45], [24, 0]);
+  const y3 = useTransform(servicesProgress, [0.35, 0.65], [24, 0]);
 
   const progressBar = useSpring(pageProgress, { stiffness: 90, damping: 28 });
 
@@ -267,13 +268,13 @@ export function CinematicHome() {
         </div>
       </section>
 
-      <section ref={servicesRef} className="relative h-[240vh]">
-        <div className="sticky top-0 flex h-[100svh] items-center overflow-hidden">
+      <section ref={servicesRef} className="relative h-[160vh] sm:h-[200vh]">
+        <div className="sticky top-0 flex min-h-[100svh] items-center overflow-hidden py-16">
           <div className="absolute inset-0">
             <FullBleed src={SCENES.desk} alt="Setup da sviluppatori" />
-            <div className="absolute inset-0 bg-black/70" />
+            <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/75 to-black/85" />
           </div>
-          <div className="relative z-10 mx-auto grid w-full max-w-6xl gap-6 px-6 sm:grid-cols-3">
+          <div className="relative z-10 mx-auto grid w-full max-w-6xl gap-5 px-4 sm:grid-cols-3 sm:gap-6 sm:px-6">
             {[
               {
                 o: c1,
@@ -300,13 +301,13 @@ export function CinematicHome() {
               <motion.div
                 key={card.title}
                 style={{ opacity: card.o, y: card.y }}
-                className="rounded-3xl border border-white/15 bg-black/40 p-8 backdrop-blur-xl"
+                className="rounded-3xl border border-violet-500/25 bg-zinc-950/90 p-6 shadow-[0_0_40px_rgba(0,0,0,0.5)] backdrop-blur-xl sm:p-8"
               >
-                <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-violet-500/20 text-violet-200">
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-violet-500/30 text-violet-100 sm:mb-5">
                   <card.icon className="h-6 w-6" />
                 </div>
-                <h3 className="text-2xl font-semibold text-white">{card.title}</h3>
-                <p className="mt-3 text-sm leading-relaxed text-zinc-300">{card.text}</p>
+                <h3 className="text-xl font-semibold text-white sm:text-2xl">{card.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-zinc-200 sm:mt-3">{card.text}</p>
               </motion.div>
             ))}
           </div>
@@ -428,20 +429,13 @@ export function CinematicHome() {
           {[
             { icon: Shield, t: "Codice solido", d: "Architetture pensate per durare." },
             { icon: Zap, t: "Consegne rapide", d: "Iterazioni corte, feedback continui." },
-            { icon: Rocket, t: "Supporto reale", d: "Restiamo dopo il rilascio." },
-          ].map((f, i) => (
-            <motion.div
-              key={f.t}
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.08 }}
-              className="text-center"
-            >
-              <f.icon className="mx-auto mb-3 h-6 w-6 text-violet-400" />
-              <h3 className="font-semibold text-white">{f.t}</h3>
-              <p className="mt-1 text-sm text-zinc-500">{f.d}</p>
-            </motion.div>
+            { icon: Code2, t: "Stack moderno", d: "Next.js, TypeScript, Firebase e Discord." },
+          ].map((item) => (
+            <div key={item.t} className="text-center">
+              <item.icon className="mx-auto mb-3 h-7 w-7 text-violet-300" />
+              <h3 className="font-semibold text-white">{item.t}</h3>
+              <p className="mt-1 text-sm text-zinc-400">{item.d}</p>
+            </div>
           ))}
         </div>
       </section>

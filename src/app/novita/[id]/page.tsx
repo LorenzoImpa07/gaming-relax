@@ -50,7 +50,9 @@ export default function NovitaDetailPage() {
   }, [id]);
 
   if (loading) {
-    return <p className="px-4 py-24 text-center text-sm text-zinc-500">Caricamento...</p>;
+    return (
+      <p className="px-4 py-24 text-center text-sm text-zinc-500">Caricamento...</p>
+    );
   }
 
   if (notFound || !item) {
@@ -74,22 +76,26 @@ export default function NovitaDetailPage() {
         Tutte le novità
       </Link>
 
+      <p className="text-sm text-zinc-500">{item.date}</p>
+      <h1 className="mt-2 text-3xl font-bold text-white sm:text-4xl">{item.title}</h1>
+      <div className="mt-6 whitespace-pre-wrap text-base leading-relaxed text-zinc-300">
+        {item.text}
+      </div>
+
       {item.image ? (
-        <div className="mb-8 overflow-hidden rounded-2xl border border-zinc-800">
+        <div className="mt-10 overflow-hidden rounded-2xl border border-zinc-800">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={item.image} alt={item.title} className="max-h-[28rem] w-full object-cover" />
+          <img
+            src={item.image}
+            alt={item.title}
+            className="max-h-[28rem] w-full object-cover"
+          />
         </div>
       ) : (
-        <div className="mb-8 flex h-40 items-center justify-center rounded-2xl border border-zinc-800 bg-violet-500/10 text-violet-400">
+        <div className="mt-10 flex h-40 items-center justify-center rounded-2xl border border-zinc-800 bg-violet-500/10 text-violet-400">
           <Megaphone className="h-10 w-10" />
         </div>
       )}
-
-      <p className="text-sm text-zinc-500">{item.date}</p>
-      <h1 className="mt-2 text-3xl font-bold text-white sm:text-4xl">{item.title}</h1>
-      <div className="mt-8 whitespace-pre-wrap text-base leading-relaxed text-zinc-300">
-        {item.text}
-      </div>
     </article>
   );
 }

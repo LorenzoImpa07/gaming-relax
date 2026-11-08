@@ -10,10 +10,11 @@ import {
 import { db } from "@/lib/firebase";
 import { useAuth } from "@/context/AuthContext";
 import { isAdminEmail } from "@/lib/admin";
-import type { ForumChannel, ForumThread, ForumPost } from "@/lib/forum";
+import type { ForumChannel, ForumThread, ForumPost, ForumThreadTag } from "@/lib/forum";
 import type { SiteRole } from "@/lib/roles";
 import { can, parsePermissions } from "@/lib/roles";
 import { AuthorChip } from "@/components/forum/AuthorChip";
+import { ThreadStatusBadge } from "@/components/forum/ThreadStatusBadge";
 import { ArrowLeft, Pencil, Trash2 } from "lucide-react";
 
 function toMillis(v: unknown): number {
@@ -42,6 +43,7 @@ export default function ThreadPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [allRoles, setAllRoles] = useState<SiteRole[]>([]);
+  const [threadTags, setThreadTags] = useState<ForumThreadTag[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editText, setEditText] = useState("");
 
@@ -51,6 +53,11 @@ export default function ThreadPage() {
   const canDeleteMsg = can(allRoles, user?.email, "deleteMessage", isGlobalAdmin);
   const canEditMsg = can(allRoles, user?.email, "editMessage", isGlobalAdmin);
   const canDeleteThr = can(allRoles, user?.email, "deleteThread", isGlobalAdmin);
+  const canSetTag =
+    isGlobalAdmin ||
+    can(allRoles, user?.email, "editThread", false) ||
+    can(allRoles, user?.email, "writeStaffChannels", false) ||
+    can(allRoles, user?.email, "manageForum", false);
 
   const load = async () => {
     setLoading(true);
@@ -69,6 +76,12 @@ export default function ThreadPage() {
             permissions: parsePermissions(data.permissions),
           } as SiteRole;
         }));
+      } catch {}
+      try {
+        const tagSnap = await getDocs(collection(db, "forum_thread_tags"));
+        const tags = tagSnap.docs.map((d) => ({ id: d.id, ...d.data() } as ForumThreadTag));
+        tags.sort((a, b) => (a.order || 0) - (b.order || 0));
+        setThreadTags(tags);
       } catch {}
 
       const [chDoc, thDoc] = await Promise.all([
@@ -148,6 +161,18 @@ export default function ThreadPage() {
     } catch { setError("Impossibile eliminare la discussione."); }
   };
 
+  const applyTag = async (tg: ForumThreadTag | null) => {
+    if (!canSetTag) return;
+    try {
+      await updateDoc(doc(db, "forum_threads", threadId), {
+        statusTagId: tg?.id || null,
+        statusTagName: tg?.name || null,
+        statusTagColor: tg?.color || null,
+      });
+      await load();
+    } catch { setError("Impossibile aggiornare il tag."); }
+  };
+
   if (loading) return <div className="mx-auto max-w-3xl px-4 py-16 text-sm text-zinc-500">Caricamento...</div>;
   if (!thread) return (
     <div className="mx-auto max-w-3xl px-4 py-16 text-center text-zinc-400">
@@ -169,7 +194,35 @@ export default function ThreadPage() {
         )}
       </div>
 
-      <h1 className="mb-2 text-2xl font-bold text-white">{thread.title}</h1>
+      <h1 className="mb-2 flex flex-wrap items-center gap-2 text-2xl font-bold text-white">
+        <ThreadStatusBadge name={thread.statusTagName} color={thread.statusTagColor} />
+        <span>{thread.title}</span>
+      </h1>
+
+      {canSetTag && (
+        <div className="mb-4 flex flex-wrap items-center gap-2">
+          <span className="text-xs text-zinc-500">Tag staff:</span>
+          <button type="button" onClick={() => applyTag(null)} className={`rounded-full border px-2.5 py-1 text-[11px] ${!thread.statusTagId ? "border-violet-500 text-violet-300" : "border-zinc-700 text-zinc-400"}`}>Nessuno</button>
+          {threadTags.map((tg) => (
+            <button
+              key={tg.id}
+              type="button"
+              onClick={() => applyTag(tg)}
+              className={`rounded px-2 py-0.5 text-[10px] font-bold uppercase ${thread.statusTagId === tg.id ? "ring-2 ring-white/40" : ""}`}
+              style={{
+                backgroundColor: tg.color,
+                color: tg.color?.toLowerCase() === "#facc15" || tg.color?.toLowerCase() === "#fbbf24" ? "#18181b" : "#fff",
+              }}
+            >
+              {tg.name}
+            </button>
+          ))}
+          {threadTags.length === 0 && (
+            <Link href="/admin/forum-tags" className="text-xs text-violet-400 hover:underline">Crea tag in Dashboard</Link>
+          )}
+        </div>
+      )}
+
       <div className="mb-8">
         <AuthorChip authorId={thread.authorId} authorName={thread.authorName} authorEmail={thread.authorEmail} allRoles={allRoles} />
       </div>

@@ -82,8 +82,8 @@ export default function StorePage() {
         </p>
       </motion.div>
 
-      <div className="grid gap-8 lg:grid-cols-[240px_1fr]">
-        <aside className="sticky top-24 h-fit space-y-6 rounded-2xl border border-zinc-800 bg-zinc-900/50 p-5 box-glow">
+      <div className="relative isolate grid gap-8 lg:grid-cols-[240px_1fr]">
+        <aside className="relative z-20 h-fit space-y-6 rounded-2xl border border-zinc-800 bg-zinc-900/80 p-5 backdrop-blur-md lg:sticky lg:top-24">
           <div>
             <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-fuchsia-400">
               Disponibilità
@@ -124,7 +124,7 @@ export default function StorePage() {
           </div>
         </aside>
 
-        <div className="grid gap-8 overflow-visible pt-2 sm:grid-cols-2 xl:grid-cols-3">
+        <div className="relative z-0 grid gap-6 overflow-visible sm:grid-cols-2 sm:gap-8 xl:grid-cols-3">
           {filtered.length === 0 && (
             <p className="col-span-full text-sm text-zinc-500">Nessun servizio con questi filtri.</p>
           )}

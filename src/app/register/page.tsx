@@ -4,13 +4,15 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { UserPlus, Mail, Lock, User, ShieldCheck } from "lucide-react";
+import { UserPlus, Mail, Lock, User, ShieldCheck, Calendar } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { isAdminEmail } from "@/lib/admin";
+import { auth, db } from "@/lib/firebase";
+import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 
 function GoogleIcon() {
   return (
-    <svg className="h-5 w-5" viewBox="0 0 24 24">
+    <svg className="h-5 w-5" viewBox="0 0 24 24" aria-hidden>
       <path fill="#EA4335" d="M12 10.2v3.6h5.1c-.2 1.2-.9 2.2-1.9 2.9l3.1 2.4c1.8-1.7 2.8-4.1 2.8-7 0-.7-.1-1.3-.2-1.9H12z" />
       <path fill="#34A853" d="M6.6 14.3l-.5.4-2.2 1.7C5.6 19.2 8.6 21 12 21c2.7 0 4.9-.9 6.5-2.4l-3.1-2.4c-.9.6-2 1-3.4 1-2.6 0-4.8-1.7-5.6-4.1z" />
       <path fill="#4A90E2" d="M3.9 7.6C3.3 8.8 3 10.1 3 11.5s.3 2.7.9 3.9c0 .1 2.7-2.1 2.7-2.1-.2-.5-.3-1.1-.3-1.7 0-.6.1-1.2.3-1.7L3.9 7.6z" />
@@ -19,12 +21,23 @@ function GoogleIcon() {
   );
 }
 
+function ageFromBirthDate(iso: string): number {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return 0;
+  const now = new Date();
+  let age = now.getFullYear() - d.getFullYear();
+  const m = now.getMonth() - d.getMonth();
+  if (m < 0 || (m === 0 && now.getDate() < d.getDate())) age--;
+  return age;
+}
+
 export default function RegisterPage() {
   const [form, setForm] = useState({
     name: "",
     email: "",
     password: "",
     confirm: "",
+    birthDate: "",
   });
   const [code, setCode] = useState("");
   const [step, setStep] = useState<"form" | "code">("form");
@@ -39,11 +52,16 @@ export default function RegisterPage() {
     else router.push("/");
   };
 
+  const maxBirth = (() => {
+    const d = new Date();
+    d.setFullYear(d.getFullYear() - 14);
+    return d.toISOString().slice(0, 10);
+  })();
+
   const handleForm = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setInfo("");
-
     if (form.password !== form.confirm) {
       setError("Le password non coincidono");
       return;
@@ -52,7 +70,14 @@ export default function RegisterPage() {
       setError("La password deve avere almeno 6 caratteri");
       return;
     }
-
+    if (!form.birthDate) {
+      setError("Inserisci la data di nascita");
+      return;
+    }
+    if (ageFromBirthDate(form.birthDate) < 14) {
+      setError("Devi avere almeno 14 anni per registrarti");
+      return;
+    }
     setLoading(true);
     try {
       const result = await sendVerificationCode(form.email, "register");
@@ -76,6 +101,13 @@ export default function RegisterPage() {
     try {
       await verifyCode(form.email, code);
       await register(form.name, form.email, form.password);
+      if (auth.currentUser) {
+        await setDoc(
+          doc(db, "users", auth.currentUser.uid),
+          { birthDate: form.birthDate, emailVerifiedByCode: true, updatedAt: serverTimestamp() },
+          { merge: true }
+        );
+      }
       goAfter(form.email);
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "Errore registrazione";
@@ -85,9 +117,7 @@ export default function RegisterPage() {
       } else if (message.includes("weak-password")) {
         setError("Password troppo debole");
         setStep("form");
-      } else {
-        setError(message);
-      }
+      } else setError(message);
     } finally {
       setLoading(false);
     }
@@ -98,15 +128,13 @@ export default function RegisterPage() {
     setLoading(true);
     try {
       await loginWithGoogle();
-      goAfter("");
+      goAfter(auth.currentUser?.email || "");
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "Errore Google";
       if (message.includes("popup-closed")) setError("Registrazione Google annullata");
-      else if (message.includes("unauthorized-domain")) {
-        setError(
-          "Dominio non autorizzato in Firebase. Aggiungi il dominio in Authentication → Authorized domains."
-        );
-      } else setError("Errore registrazione con Google. Riprova.");
+      else if (message.includes("unauthorized-domain"))
+        setError("Dominio non autorizzato. Aggiungi il dominio Vercel in Firebase Authorized domains.");
+      else setError("Errore registrazione con Google. Riprova.");
     } finally {
       setLoading(false);
     }
@@ -117,29 +145,23 @@ export default function RegisterPage() {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-8 box-glow"
+        className="rounded-2xl border border-zinc-800/80 bg-zinc-900/60 p-8 backdrop-blur box-glow"
       >
         <div className="text-center mb-8">
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-violet-500/20 text-violet-400">
             <UserPlus className="h-6 w-6" />
           </div>
-          <h1 className="text-2xl font-bold text-white">Crea account</h1>
+          <h1 className="text-2xl font-bold text-white text-glow">Crea account</h1>
           <p className="mt-2 text-sm text-zinc-400">
-            {step === "form"
-              ? "Registrati su Gaming Relax"
-              : "Conferma la tua email con il codice ricevuto"}
+            {step === "form" ? "Compila i dati e verifica la tua email" : "Inserisci il codice ricevuto via email"}
           </p>
         </div>
 
         {error && (
-          <div className="mb-4 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
-            {error}
-          </div>
+          <div className="mb-4 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">{error}</div>
         )}
         {info && (
-          <div className="mb-4 rounded-xl border border-violet-500/30 bg-violet-500/10 px-4 py-3 text-sm text-violet-200">
-            {info}
-          </div>
+          <div className="mb-4 rounded-xl border border-violet-500/30 bg-violet-500/10 px-4 py-3 text-sm text-violet-200">{info}</div>
         )}
 
         {step === "form" ? (
@@ -148,62 +170,39 @@ export default function RegisterPage() {
               <label className="block text-sm font-medium text-zinc-300 mb-1.5">Nome</label>
               <div className="relative">
                 <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
-                <input
-                  required
-                  value={form.name}
-                  onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  className="w-full rounded-xl border border-zinc-700 bg-zinc-950 pl-10 pr-4 py-3 text-white focus:border-violet-500 focus:outline-none"
-                  placeholder="Il tuo nome"
-                />
+                <input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="w-full rounded-xl border border-zinc-700 bg-zinc-950 pl-10 pr-4 py-3 text-white focus:border-violet-500 focus:outline-none" placeholder="Il tuo nome" />
               </div>
             </div>
             <div>
               <label className="block text-sm font-medium text-zinc-300 mb-1.5">Email</label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
-                <input
-                  type="email"
-                  required
-                  value={form.email}
-                  onChange={(e) => setForm({ ...form, email: e.target.value })}
-                  className="w-full rounded-xl border border-zinc-700 bg-zinc-950 pl-10 pr-4 py-3 text-white focus:border-violet-500 focus:outline-none"
-                  placeholder="email@esempio.com"
-                />
+                <input type="email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className="w-full rounded-xl border border-zinc-700 bg-zinc-950 pl-10 pr-4 py-3 text-white focus:border-violet-500 focus:outline-none" placeholder="email@esempio.com" />
               </div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-zinc-300 mb-1.5">Data di nascita</label>
+              <div className="relative">
+                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
+                <input type="date" required max={maxBirth} value={form.birthDate} onChange={(e) => setForm({ ...form, birthDate: e.target.value })} className="w-full rounded-xl border border-zinc-700 bg-zinc-950 pl-10 pr-4 py-3 text-white focus:border-violet-500 focus:outline-none" />
+              </div>
+              <p className="mt-1 text-xs text-zinc-500">Eta minima: 14 anni.</p>
             </div>
             <div>
               <label className="block text-sm font-medium text-zinc-300 mb-1.5">Password</label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
-                <input
-                  type="password"
-                  required
-                  value={form.password}
-                  onChange={(e) => setForm({ ...form, password: e.target.value })}
-                  className="w-full rounded-xl border border-zinc-700 bg-zinc-950 pl-10 pr-4 py-3 text-white focus:border-violet-500 focus:outline-none"
-                  placeholder="Min. 6 caratteri"
-                />
+                <input type="password" required value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} className="w-full rounded-xl border border-zinc-700 bg-zinc-950 pl-10 pr-4 py-3 text-white focus:border-violet-500 focus:outline-none" placeholder="Min. 6 caratteri" />
               </div>
             </div>
             <div>
               <label className="block text-sm font-medium text-zinc-300 mb-1.5">Conferma password</label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
-                <input
-                  type="password"
-                  required
-                  value={form.confirm}
-                  onChange={(e) => setForm({ ...form, confirm: e.target.value })}
-                  className="w-full rounded-xl border border-zinc-700 bg-zinc-950 pl-10 pr-4 py-3 text-white focus:border-violet-500 focus:outline-none"
-                  placeholder="Ripeti password"
-                />
+                <input type="password" required value={form.confirm} onChange={(e) => setForm({ ...form, confirm: e.target.value })} className="w-full rounded-xl border border-zinc-700 bg-zinc-950 pl-10 pr-4 py-3 text-white focus:border-violet-500 focus:outline-none" placeholder="Ripeti password" />
               </div>
             </div>
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full rounded-full bg-gradient-to-r from-violet-600 to-cyan-500 py-3.5 text-sm font-semibold text-white btn-glow disabled:opacity-60"
-            >
+            <button type="submit" disabled={loading} className="w-full rounded-full bg-gradient-to-r from-violet-600 to-cyan-500 py-3.5 text-sm font-semibold text-white btn-glow disabled:opacity-60">
               {loading ? "Invio codice..." : "Continua — verifica email"}
             </button>
           </form>
@@ -213,63 +212,31 @@ export default function RegisterPage() {
               <label className="block text-sm font-medium text-zinc-300 mb-1.5">Codice a 6 cifre</label>
               <div className="relative">
                 <ShieldCheck className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
-                <input
-                  inputMode="numeric"
-                  pattern="[0-9]{6}"
-                  maxLength={6}
-                  required
-                  value={code}
-                  onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
-                  className="w-full rounded-xl border border-zinc-700 bg-zinc-950 pl-10 pr-4 py-3 text-white tracking-[0.4em] text-center text-lg focus:border-violet-500 focus:outline-none"
-                  placeholder="000000"
-                />
+                <input inputMode="numeric" pattern="[0-9]{6}" maxLength={6} required value={code} onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))} className="w-full rounded-xl border border-zinc-700 bg-zinc-950 pl-10 pr-4 py-3 text-center text-lg tracking-[0.4em] text-white focus:border-violet-500 focus:outline-none" placeholder="000000" />
               </div>
             </div>
-            <button
-              type="submit"
-              disabled={loading || code.length !== 6}
-              className="w-full rounded-full bg-gradient-to-r from-violet-600 to-cyan-500 py-3.5 text-sm font-semibold text-white btn-glow disabled:opacity-60"
-            >
+            <button type="submit" disabled={loading || code.length !== 6} className="w-full rounded-full bg-gradient-to-r from-violet-600 to-cyan-500 py-3.5 text-sm font-semibold text-white btn-glow disabled:opacity-60">
               {loading ? "Creazione account..." : "Verifica e registra"}
             </button>
-            <button
-              type="button"
-              onClick={() => {
-                setStep("form");
-                setCode("");
-                setInfo("");
-              }}
-              className="w-full text-sm text-zinc-400 hover:text-white"
-            >
+            <button type="button" onClick={() => { setStep("form"); setCode(""); setInfo(""); }} className="w-full text-sm text-zinc-400 hover:text-white">
               Torna indietro
             </button>
           </form>
         )}
 
         <div className="relative my-6">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-zinc-800" />
-          </div>
-          <div className="relative flex justify-center text-xs">
-            <span className="bg-zinc-900/50 px-3 text-zinc-500">oppure</span>
-          </div>
+          <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-zinc-800" /></div>
+          <div className="relative flex justify-center text-xs"><span className="bg-zinc-900/60 px-3 text-zinc-500">oppure</span></div>
         </div>
 
-        <button
-          type="button"
-          onClick={handleGoogle}
-          disabled={loading}
-          className="flex w-full items-center justify-center gap-3 rounded-full border border-zinc-700 bg-zinc-950 py-3 text-sm font-medium text-white hover:border-zinc-500 disabled:opacity-60"
-        >
+        <button type="button" onClick={handleGoogle} disabled={loading} className="flex w-full items-center justify-center gap-3 rounded-full border border-zinc-700 bg-zinc-950 py-3 text-sm font-medium text-white hover:border-violet-500/50 disabled:opacity-60">
           <GoogleIcon />
           Continua con Google
         </button>
 
         <p className="mt-6 text-center text-sm text-zinc-400">
           Hai gia un account?{" "}
-          <Link href="/login" className="text-violet-400 hover:underline">
-            Accedi
-          </Link>
+          <Link href="/login" className="text-violet-400 hover:underline">Accedi</Link>
         </p>
       </motion.div>
     </div>

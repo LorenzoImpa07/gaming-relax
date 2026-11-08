@@ -138,7 +138,7 @@ export default function RecensioniPage() {
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-14 text-center">
         <h1 className="text-3xl font-bold text-white sm:text-4xl text-glow">Recensioni</h1>
         <p className="mx-auto mt-4 max-w-xl text-zinc-400">
-          Solo le recensioni approvate dalla dashboard compaiono qui.
+          Cosa dicono di noi e spazio per lasciare la tua esperienza.
         </p>
       </motion.div>
 
@@ -180,7 +180,7 @@ export default function RecensioniPage() {
             <CheckCircle2 className="mx-auto mb-4 h-12 w-12 text-green-400" />
             <h2 className="mb-2 text-xl font-semibold text-white">Recensione inviata!</h2>
             <p className="mb-6 text-sm text-zinc-400">
-              Sara pubblicata dopo l'approvazione dello staff dalla dashboard.
+              Sara pubblicata dopo una rapida verifica dello staff.
             </p>
             <button onClick={() => setDone(false)} className="text-sm text-violet-400 hover:text-violet-300">
               Invia un'altra recensione

@@ -124,7 +124,7 @@ export default function StorePage() {
           </div>
         </aside>
 
-        <div className="grid gap-8 overflow-visible sm:grid-cols-2 xl:grid-cols-3">
+        <div className="grid gap-8 overflow-visible pt-2 sm:grid-cols-2 xl:grid-cols-3">
           {filtered.length === 0 && (
             <p className="col-span-full text-sm text-zinc-500">Nessun servizio con questi filtri.</p>
           )}
@@ -134,28 +134,34 @@ export default function StorePage() {
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.05 }}
-              className={`relative flex flex-col overflow-visible rounded-2xl border p-6 pt-8 card-shine box-glow-hover ${
+              className={`relative flex flex-col overflow-hidden rounded-2xl border p-6 card-shine box-glow-hover ${
                 service.popular
                   ? "border-violet-500/50 bg-violet-500/5 box-glow"
                   : "border-zinc-800 bg-zinc-900/40"
               }`}
             >
-              {service.popular && (
-                <span className="absolute -top-3 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded-full bg-gradient-to-r from-violet-600 to-cyan-500 px-3 py-0.5 text-xs font-semibold text-white btn-glow">
-                  Più richiesto
-                </span>
-              )}
-              {service.available === false && (
-                <span className="absolute right-3 top-3 rounded-full bg-zinc-800 px-2 py-0.5 text-[10px] text-zinc-400">
-                  Esaurito
-                </span>
-              )}
+              <div className="mb-3 flex min-h-[1.5rem] items-center justify-between gap-2">
+                {service.popular ? (
+                  <span className="inline-flex shrink-0 items-center rounded-full bg-gradient-to-r from-violet-600 to-cyan-500 px-3 py-1 text-[11px] font-semibold text-white shadow-[0_0_16px_rgba(139,92,246,0.45)]">
+                    Più richiesto
+                  </span>
+                ) : (
+                  <span />
+                )}
+                {service.available === false && (
+                  <span className="rounded-full bg-zinc-800 px-2 py-0.5 text-[10px] text-zinc-400">
+                    Esaurito
+                  </span>
+                )}
+              </div>
+
               <Link href={`/store/${service.id}`} className="group">
                 <h3 className="text-xl font-semibold text-white transition-colors group-hover:text-violet-300">
                   {service.name}
                 </h3>
                 <p className="mt-2 line-clamp-3 text-sm text-zinc-400">{service.description}</p>
               </Link>
+
               <div className="mb-5 mt-4">
                 {service.discountPercent && service.discountPercent > 0 ? (
                   <>
@@ -170,6 +176,7 @@ export default function StorePage() {
                 )}
                 <span className="ml-1 text-sm text-zinc-500">una tantum</span>
               </div>
+
               <ul className="mb-6 flex-1 space-y-2">
                 {service.features.slice(0, 5).map((f) => (
                   <li key={f} className="flex items-start gap-2 text-sm text-zinc-300">
@@ -178,6 +185,7 @@ export default function StorePage() {
                   </li>
                 ))}
               </ul>
+
               <div className="mt-auto flex flex-col gap-2">
                 <Link
                   href={`/store/${service.id}`}

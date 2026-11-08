@@ -186,15 +186,7 @@ export function Navbar() {
               {link.label}
             </Link>
           ))}
-          {user ? (
-            <button
-              type="button"
-              onClick={handleLogout}
-              className="rounded-lg px-4 py-3 text-left text-zinc-300 hover:bg-zinc-900"
-            >
-              Esci
-            </button>
-          ) : (
+          {!user && (
             <Link
               href="/login"
               onClick={() => setOpen(false)}

@@ -174,7 +174,7 @@ export default function StorePage() {
                 ) : (
                   <span className="text-3xl font-bold text-white">€{service.price}</span>
                 )}
-                <span className="ml-1 text-sm text-zinc-500">una tantum</span>
+                <span className="ml-1 text-sm text-zinc-500">al mese</span>
               </div>
 
               <ul className="mb-6 flex-1 space-y-2">

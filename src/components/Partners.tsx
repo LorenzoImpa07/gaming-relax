@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, onSnapshot } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 
 type Partner = { id: string; name: string; href: string; image: string };
@@ -11,12 +11,7 @@ const FALLBACK_IMAGE =
   "https://images.unsplash.com/photo-1614680376408-81e91ffe3db7?w=400&q=80";
 
 const fallbackPartners: Partner[] = [
-  {
-    id: "fallback",
-    name: "Mega Wolf",
-    href: "#",
-    image: FALLBACK_IMAGE,
-  },
+  { id: "fallback", name: "Mega Wolf", href: "#", image: FALLBACK_IMAGE },
 ];
 
 function isValidImageSrc(src: string | undefined | null): boolean {
@@ -54,8 +49,9 @@ export function Partners() {
   const [partners, setPartners] = useState<Partner[]>(fallbackPartners);
 
   useEffect(() => {
-    getDocs(collection(db, "site_partners"))
-      .then((snap) => {
+    const unsub = onSnapshot(
+      collection(db, "site_partners"),
+      (snap) => {
         if (snap.empty) return;
         const list = snap.docs.map((d) => {
           const data = d.data();
@@ -67,14 +63,16 @@ export function Partners() {
           };
         });
         if (list.length > 0) setPartners(list);
-      })
-      .catch(() => {});
+      },
+      () => {}
+    );
+    return () => unsub();
   }, []);
 
   return (
-    <section className="relative py-24 sm:py-28 overflow-hidden">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-violet-950/20 via-transparent to-transparent pointer-events-none" />
-      <div className="relative mx-auto max-w-6xl px-4 sm:px-6 text-center">
+    <section className="relative overflow-hidden py-24 sm:py-28">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-violet-950/20 via-transparent to-transparent" />
+      <div className="relative mx-auto max-w-6xl px-4 text-center sm:px-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -82,8 +80,8 @@ export function Partners() {
           className="mb-12"
         >
           <h2 className="text-3xl font-bold text-white sm:text-4xl">I nostri partner</h2>
-          <p className="mt-3 text-zinc-400 max-w-xl mx-auto text-sm sm:text-base">
-            Collaborazioni e realta con cui lavoriamo fianco a fianco.
+          <p className="mx-auto mt-3 max-w-xl text-sm text-zinc-400 sm:text-base">
+            Collaborazioni aggiornate in tempo reale dalla dashboard.
           </p>
         </motion.div>
 
@@ -110,7 +108,7 @@ export function Partners() {
                   className="h-full w-full rounded-xl object-cover"
                 />
               </div>
-              <span className="text-sm text-zinc-400 group-hover:text-violet-300 transition-colors">
+              <span className="text-sm text-zinc-400 transition-colors group-hover:text-violet-300">
                 {partner.name}
               </span>
             </motion.a>

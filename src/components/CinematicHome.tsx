@@ -22,7 +22,7 @@ const SCENES = {
   hero: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=1920&q=85",
   codeClose: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=1920&q=85",
   laptopDark: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=1920&q=85",
-  desk: "https://images.unsplash.com/photo-1498050108023-c8199c3246c7?w=1920&q=85",
+  desk: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=1920&q=85",
   neonCity: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=1920&q=85",
   terminal: "https://images.unsplash.com/photo-1627398242454-45a1465c2479?w=1920&q=85",
   teamWork: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1920&q=85",
@@ -102,7 +102,6 @@ export function CinematicHome() {
   const s4Opacity = useTransform(s4, [0.1, 0.3, 0.7, 0.9], [0.35, 1, 1, 0.5]);
   const s4Scale = useTransform(s4, [0, 0.5, 1], [1.06, 1, 1.05]);
 
-  // Opacità minima alta: su mobile le card non devono sparire
   const c1 = useTransform(servicesProgress, [0, 0.12, 0.35, 0.55], [0.7, 1, 1, 0.95]);
   const c2 = useTransform(servicesProgress, [0.15, 0.3, 0.5, 0.7], [0.7, 1, 1, 0.95]);
   const c3 = useTransform(servicesProgress, [0.35, 0.5, 0.7, 1], [0.7, 1, 1, 1]);
@@ -316,21 +315,26 @@ export function CinematicHome() {
 
       <section className="relative py-8">
         <div className="grid grid-cols-2 md:grid-cols-4">
-          {[SCENES.keyboard, SCENES.terminal, SCENES.server, SCENES.desk].map((src, i) => (
+          {[
+            { src: SCENES.keyboard, alt: "Tastiera setup sviluppo" },
+            { src: SCENES.terminal, alt: "Codice a schermo" },
+            { src: SCENES.server, alt: "Infrastruttura server" },
+            { src: SCENES.laptopDark, alt: "Laptop e sviluppo software" },
+          ].map((item, i) => (
             <motion.div
-              key={src}
+              key={`${item.src}-${i}`}
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.08 }}
-              className="relative aspect-[4/5] overflow-hidden md:aspect-square"
+              className="relative aspect-[4/5] overflow-hidden bg-zinc-900 md:aspect-square"
             >
               <Image
-                src={src}
-                alt={`Tech ${i + 1}`}
+                src={item.src}
+                alt={item.alt}
                 fill
                 className="object-cover transition duration-700 hover:scale-105"
-                sizes="25vw"
+                sizes="(max-width:768px) 50vw, 25vw"
               />
               <div className="absolute inset-0 bg-black/25 transition hover:bg-black/10" />
             </motion.div>

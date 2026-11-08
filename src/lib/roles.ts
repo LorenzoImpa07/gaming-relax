@@ -1,14 +1,52 @@
+export type ForumPermissions = {
+  deleteMessage: boolean;
+  editMessage: boolean;
+  deleteThread: boolean;
+  editThread: boolean;
+  deleteChannel: boolean;
+  editChannel: boolean;
+  createChannel: boolean;
+  writeStaffChannels: boolean;
+  manageForum: boolean;
+};
+
+export const DEFAULT_PERMISSIONS: ForumPermissions = {
+  deleteMessage: false,
+  editMessage: false,
+  deleteThread: false,
+  editThread: false,
+  deleteChannel: false,
+  editChannel: false,
+  createChannel: false,
+  writeStaffChannels: false,
+  manageForum: false,
+};
+
+export const PERMISSION_LABELS: { key: keyof ForumPermissions; label: string; hint: string }[] = [
+  { key: "deleteMessage", label: "Eliminare messaggi", hint: "Può cancellare messaggi di altri utenti nel forum" },
+  { key: "editMessage", label: "Modificare messaggi", hint: "Può modificare messaggi di altri utenti" },
+  { key: "deleteThread", label: "Eliminare discussioni", hint: "Può eliminare intere discussioni" },
+  { key: "editThread", label: "Modificare discussioni", hint: "Può cambiare il titolo di una discussione" },
+  { key: "deleteChannel", label: "Eliminare canali", hint: "Può eliminare canali del forum" },
+  { key: "editChannel", label: "Modificare canali", hint: "Può modificare nome/descrizione/tag dei canali" },
+  { key: "createChannel", label: "Creare canali", hint: "Può creare nuovi canali" },
+  { key: "writeStaffChannels", label: "Scrivere in canali solo-staff", hint: "Può postare nei canali riservati allo staff" },
+  { key: "manageForum", label: "Gestire forum (Dashboard)", hint: "Accesso alle impostazioni forum dalla Dashboard" },
+];
+
 export type SiteRole = {
   id: string;
   name: string;
   color: string;
   emails: string[];
   order?: number;
+  permissions?: ForumPermissions;
 };
 
 export const DEFAULT_ROLE: Omit<SiteRole, "id" | "emails"> = {
   name: "Utente",
   color: "#ffffff",
+  permissions: { ...DEFAULT_PERMISSIONS },
 };
 
 export function normalizeEmail(email: string | null | undefined): string {
@@ -31,6 +69,38 @@ export function hasStaffRole(
   email: string | null | undefined
 ): boolean {
   return rolesForEmail(allRoles, email).length > 0;
+}
+
+export function can(
+  allRoles: SiteRole[],
+  email: string | null | undefined,
+  permission: keyof ForumPermissions,
+  isGlobalAdmin = false
+): boolean {
+  if (isGlobalAdmin) return true;
+  const mine = rolesForEmail(allRoles, email);
+  return mine.some((r) => !!(r.permissions && r.permissions[permission]));
+}
+
+export function mergePermissions(roles: SiteRole[]): ForumPermissions {
+  const out = { ...DEFAULT_PERMISSIONS };
+  for (const r of roles) {
+    if (!r.permissions) continue;
+    (Object.keys(out) as (keyof ForumPermissions)[]).forEach((k) => {
+      if (r.permissions![k]) out[k] = true;
+    });
+  }
+  return out;
+}
+
+export function parsePermissions(raw: unknown): ForumPermissions {
+  const base = { ...DEFAULT_PERMISSIONS };
+  if (!raw || typeof raw !== "object") return base;
+  const o = raw as Record<string, unknown>;
+  (Object.keys(base) as (keyof ForumPermissions)[]).forEach((k) => {
+    if (typeof o[k] === "boolean") base[k] = o[k] as boolean;
+  });
+  return base;
 }
 
 export const ROLE_COLOR_PRESETS = [

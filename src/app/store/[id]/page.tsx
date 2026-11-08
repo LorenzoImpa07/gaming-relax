@@ -195,7 +195,7 @@ export default function ServiceDetailPage() {
           ) : (
             <span className="text-4xl font-bold text-white">€{displayPrice}</span>
           )}
-          <span className="text-zinc-500">{selectedPlan ? selectedPlan.name : "una tantum"}</span>
+          <span className="text-zinc-500">{selectedPlan ? selectedPlan.name : "al mese"}</span>
         </div>
 
         {service.details && (

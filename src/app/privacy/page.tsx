@@ -10,8 +10,8 @@ export default function PrivacyPage() {
         <h2 className="text-xl font-semibold text-white mt-8">1. Titolare del trattamento</h2>
         <p>
           Il titolare del trattamento dei dati è Gaming Relax, raggiungibile all’indirizzo email{" "}
-          <a href="mailto:info@gamingrelaxofficials.it" className="text-violet-400 hover:underline">
-            info@gamingrelaxofficials.it
+          <a href="mailto:supportogamingrelax@gmail.com" className="text-violet-400 hover:underline">
+            supportogamingrelax@gmail.com
           </a>
           .
         </p>
@@ -39,8 +39,8 @@ export default function PrivacyPage() {
         <p>
           Hai il diritto di accedere, rettificare, cancellare i tuoi dati, limitarne il trattamento,
           opporti e richiedere la portabilità. Per esercitare i diritti puoi scrivere a{" "}
-          <a href="mailto:info@gamingrelaxofficials.it" className="text-violet-400 hover:underline">
-            info@gamingrelaxofficials.it
+          <a href="mailto:supportogamingrelax@gmail.com" className="text-violet-400 hover:underline">
+            supportogamingrelax@gmail.com
           </a>
           .
         </p>

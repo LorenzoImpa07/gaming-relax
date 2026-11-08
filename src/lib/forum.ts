@@ -20,6 +20,13 @@ export type ForumChannel = {
   messageCount?: number;
 };
 
+export type ForumThreadTag = {
+  id: string;
+  name: string;
+  color: string;
+  order?: number;
+};
+
 export type ForumThread = {
   id: string;
   channelId: string;
@@ -30,6 +37,10 @@ export type ForumThread = {
   createdAt?: unknown;
   replyCount: number;
   lastActivity?: unknown;
+  statusTagId?: string | null;
+  statusTagName?: string | null;
+  statusTagColor?: string | null;
+  locked?: boolean;
 };
 
 export type ForumPost = {
@@ -52,4 +63,15 @@ export const CATEGORY_COLOR_PRESETS = [
   { label: "Ambra", value: "#fbbf24" },
   { label: "Rosso", value: "#f87171" },
   { label: "Arancio", value: "#fb923c" },
+  { label: "Giallo", value: "#facc15" },
+  { label: "Grigio", value: "#a1a1aa" },
+];
+
+export const DEFAULT_THREAD_TAG_SUGGESTIONS = [
+  { name: "Guida", color: "#facc15" },
+  { name: "Chiuso", color: "#a1a1aa" },
+  { name: "Risolto", color: "#22c55e" },
+  { name: "In attesa", color: "#60a5fa" },
+  { name: "Regolamento", color: "#a78bfa" },
+  { name: "Respinto", color: "#ef4444" },
 ];

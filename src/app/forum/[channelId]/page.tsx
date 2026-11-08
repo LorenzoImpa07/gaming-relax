@@ -19,7 +19,10 @@ import { db } from "@/lib/firebase";
 import { useAuth } from "@/context/AuthContext";
 import { isAdminEmail } from "@/lib/admin";
 import type { ForumChannel, ForumThread } from "@/lib/forum";
+import type { SiteRole } from "@/lib/roles";
+import { can, parsePermissions } from "@/lib/roles";
 import { ArrowLeft, Plus, MessageSquare } from "lucide-react";
+import { ThreadStatusBadge } from "@/components/forum/ThreadStatusBadge";
 
 function toMillis(v: unknown): number {
   if (!v) return 0;
@@ -50,13 +53,31 @@ export default function ChannelPage() {
   const [body, setBody] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [allRoles, setAllRoles] = useState<SiteRole[]>([]);
 
-  const isStaff = isAdminEmail(user?.email);
-  const canPost = !!user && (!channel?.staffOnly || isStaff);
+  const isGlobalAdmin = isAdminEmail(user?.email);
+  const canWriteStaff = can(allRoles, user?.email, "writeStaffChannels", isGlobalAdmin);
+  const canPost = !!user && (!channel?.staffOnly || canWriteStaff || isGlobalAdmin);
 
   const load = async () => {
     setLoading(true);
     try {
+      try {
+        const rolesSnap = await getDocs(collection(db, "site_roles"));
+        setAllRoles(
+          rolesSnap.docs.map((d) => {
+            const data = d.data();
+            return {
+              id: d.id,
+              name: String(data.name || ""),
+              color: String(data.color || "#a78bfa"),
+              emails: Array.isArray(data.emails) ? data.emails.map(String) : [],
+              order: Number(data.order) || 0,
+              permissions: parsePermissions(data.permissions),
+            } as SiteRole;
+          })
+        );
+      } catch {}
       const chDoc = await getDoc(doc(db, "forum_channels", channelId));
       if (!chDoc.exists()) {
         setChannel(null);
@@ -113,6 +134,7 @@ export default function ChannelPage() {
         content: body.trim(),
         authorId: user.uid,
         authorName: user.displayName || user.email || "Utente",
+        authorEmail: user.email || "",
         createdAt: serverTimestamp(),
       });
       try {
@@ -120,9 +142,7 @@ export default function ChannelPage() {
           threadCount: increment(1),
           messageCount: increment(1),
         });
-      } catch {
-        /* contatori non critici */
-      }
+      } catch {}
       setTitle("");
       setBody("");
       setShowNew(false);
@@ -130,7 +150,7 @@ export default function ChannelPage() {
       router.push(`/forum/${encodeURIComponent(channelId)}/${threadRef.id}`);
     } catch (err) {
       console.error(err);
-      setError("Errore creazione discussione. Controlla di essere loggato e le regole Firestore.");
+      setError("Errore creazione discussione.");
     } finally {
       setSaving(false);
     }
@@ -155,10 +175,7 @@ export default function ChannelPage() {
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6 sm:py-16">
-      <Link
-        href="/forum"
-        className="mb-6 inline-flex items-center gap-1.5 text-sm text-zinc-400 hover:text-white"
-      >
+      <Link href="/forum" className="mb-6 inline-flex items-center gap-1.5 text-sm text-zinc-400 hover:text-white">
         <ArrowLeft className="h-4 w-4" />
         Forum
       </Link>
@@ -186,39 +203,15 @@ export default function ChannelPage() {
       </div>
 
       {showNew && canPost && (
-        <form
-          onSubmit={createThread}
-          className="mb-8 space-y-3 rounded-2xl border border-zinc-800 bg-zinc-900/50 p-5"
-        >
-          <input
-            required
-            placeholder="Titolo discussione"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-4 py-3 text-sm text-white"
-          />
-          <textarea
-            required
-            placeholder="Primo messaggio..."
-            value={body}
-            onChange={(e) => setBody(e.target.value)}
-            rows={4}
-            className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-4 py-3 text-sm text-white"
-          />
+        <form onSubmit={createThread} className="mb-8 space-y-3 rounded-2xl border border-zinc-800 bg-zinc-900/50 p-5">
+          <input required placeholder="Titolo discussione" value={title} onChange={(e) => setTitle(e.target.value)} className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-4 py-3 text-sm text-white" />
+          <textarea required placeholder="Primo messaggio..." value={body} onChange={(e) => setBody(e.target.value)} rows={4} className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-4 py-3 text-sm text-white" />
           {error && <p className="text-sm text-red-400">{error}</p>}
           <div className="flex gap-2">
-            <button
-              type="submit"
-              disabled={saving}
-              className="rounded-full bg-violet-600 px-5 py-2 text-sm text-white disabled:opacity-50"
-            >
+            <button type="submit" disabled={saving} className="rounded-full bg-violet-600 px-5 py-2 text-sm text-white disabled:opacity-50">
               {saving ? "Creazione..." : "Pubblica"}
             </button>
-            <button
-              type="button"
-              onClick={() => setShowNew(false)}
-              className="rounded-full border border-zinc-600 px-5 py-2 text-sm text-zinc-300"
-            >
+            <button type="button" onClick={() => setShowNew(false)} className="rounded-full border border-zinc-600 px-5 py-2 text-sm text-zinc-300">
               Annulla
             </button>
           </div>
@@ -227,10 +220,7 @@ export default function ChannelPage() {
 
       {!user && (
         <p className="mb-6 text-sm text-zinc-500">
-          <Link href={`/login?next=/forum/${channelId}`} className="text-violet-400 hover:underline">
-            Accedi
-          </Link>{" "}
-          per aprire una discussione.
+          <Link href={`/login?next=/forum/${channelId}`} className="text-violet-400 hover:underline">Accedi</Link>{" "}per aprire una discussione.
         </p>
       )}
 
@@ -250,7 +240,10 @@ export default function ChannelPage() {
           >
             <MessageSquare className="mt-0.5 h-4 w-4 shrink-0 text-violet-400" />
             <div className="min-w-0 flex-1">
-              <p className="font-medium text-white">{t.title}</p>
+              <p className="flex flex-wrap items-center gap-2 font-medium text-white">
+                <ThreadStatusBadge name={t.statusTagName} color={t.statusTagColor} />
+                <span>{t.title}</span>
+              </p>
               <p className="mt-0.5 text-xs text-zinc-500">
                 {t.authorName}
                 {typeof t.replyCount === "number" ? ` · ${t.replyCount} risposte` : ""}

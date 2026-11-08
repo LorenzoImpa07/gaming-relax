@@ -1,12 +1,32 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Trash2, Plus, Minus, ShoppingBag } from "lucide-react";
+import { Trash2, Plus, Minus, ShoppingBag, CreditCard } from "lucide-react";
+import { collection, onSnapshot } from "firebase/firestore";
 import { useCart } from "@/context/CartContext";
+import { db } from "@/lib/firebase";
 
 export default function CarrelloPage() {
   const { items, removeItem, updateQuantity, total, clearCart } = useCart();
+  const [payNames, setPayNames] = useState<string[]>([]);
+
+  useEffect(() => {
+    const unsub = onSnapshot(
+      collection(db, "site_payment_methods"),
+      (snap) => {
+        const names = snap.docs
+          .map((d) => d.data())
+          .filter((m) => m.active !== false)
+          .sort((a, b) => (Number(a.order) || 0) - (Number(b.order) || 0))
+          .map((m) => String(m.name || "Metodo"));
+        setPayNames(names);
+      },
+      () => setPayNames([])
+    );
+    return () => unsub();
+  }, []);
 
   if (items.length === 0) {
     return (
@@ -68,6 +88,21 @@ export default function CarrelloPage() {
           </motion.div>
         ))}
       </div>
+
+      {payNames.length > 0 && (
+        <div className="mb-4 flex flex-wrap items-center gap-2 rounded-xl border border-zinc-800 bg-zinc-900/30 px-4 py-3 text-xs text-zinc-400">
+          <CreditCard className="h-3.5 w-3.5 text-violet-400" />
+          <span>Metodi accettati:</span>
+          {payNames.map((n) => (
+            <span
+              key={n}
+              className="rounded-full border border-zinc-700 px-2 py-0.5 text-zinc-300"
+            >
+              {n}
+            </span>
+          ))}
+        </div>
+      )}
 
       <div className="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-6">
         <div className="mb-6 flex items-center justify-between">

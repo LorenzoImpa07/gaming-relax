@@ -11,9 +11,9 @@ export default function CarrelloPage() {
   if (items.length === 0) {
     return (
       <div className="mx-auto max-w-2xl px-4 py-24 text-center">
-        <ShoppingBag className="mx-auto h-16 w-16 text-zinc-600 mb-6" />
-        <h1 className="text-2xl font-bold text-white mb-2">Il carrello è vuoto</h1>
-        <p className="text-zinc-400 mb-8">Aggiungi dei servizi dallo Store per iniziare.</p>
+        <ShoppingBag className="mx-auto mb-6 h-16 w-16 text-zinc-600" />
+        <h1 className="mb-2 text-2xl font-bold text-white">Il carrello è vuoto</h1>
+        <p className="mb-8 text-zinc-400">Aggiungi dei servizi dallo Store per iniziare.</p>
         <Link
           href="/store"
           className="inline-flex rounded-full bg-gradient-to-r from-violet-600 to-cyan-500 px-6 py-3 text-sm font-semibold text-white"
@@ -26,38 +26,41 @@ export default function CarrelloPage() {
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-16 sm:px-6 sm:py-24">
-      <h1 className="text-3xl font-bold text-white mb-8">Il tuo carrello</h1>
+      <h1 className="mb-8 text-3xl font-bold text-white">Il tuo carrello</h1>
 
-      <div className="space-y-4 mb-10">
+      <div className="mb-10 space-y-4">
         {items.map((item) => (
           <motion.div
-            key={item.service.id}
+            key={`${item.service.id}-${item.planId || "base"}`}
             layout
-            className="flex flex-col sm:flex-row sm:items-center gap-4 rounded-2xl border border-zinc-800 bg-zinc-900/40 p-5"
+            className="flex flex-col gap-4 rounded-2xl border border-zinc-800 bg-zinc-900/40 p-5 sm:flex-row sm:items-center"
           >
             <div className="flex-1">
               <h3 className="font-semibold text-white">{item.service.name}</h3>
-              <p className="text-sm text-zinc-400 mt-1">{item.service.description}</p>
-              <p className="text-violet-400 font-medium mt-2">€{item.service.price}</p>
+              {item.planName && (
+                <p className="mt-0.5 text-xs text-violet-400">Piano: {item.planName}</p>
+              )}
+              <p className="mt-1 text-sm text-zinc-400">{item.service.description}</p>
+              <p className="mt-2 font-medium text-violet-400">€{item.service.price}</p>
             </div>
 
             <div className="flex items-center gap-3">
               <button
-                onClick={() => updateQuantity(item.service.id, item.quantity - 1)}
+                onClick={() => updateQuantity(item.service.id, item.quantity - 1, item.planId)}
                 className="rounded-lg border border-zinc-700 p-1.5 hover:bg-zinc-800"
               >
                 <Minus className="h-4 w-4" />
               </button>
               <span className="w-8 text-center font-medium">{item.quantity}</span>
               <button
-                onClick={() => updateQuantity(item.service.id, item.quantity + 1)}
+                onClick={() => updateQuantity(item.service.id, item.quantity + 1, item.planId)}
                 className="rounded-lg border border-zinc-700 p-1.5 hover:bg-zinc-800"
               >
                 <Plus className="h-4 w-4" />
               </button>
               <button
-                onClick={() => removeItem(item.service.id)}
-                className="ml-2 rounded-lg p-1.5 text-zinc-500 hover:text-red-400 hover:bg-red-500/10"
+                onClick={() => removeItem(item.service.id, item.planId)}
+                className="ml-2 rounded-lg p-1.5 text-zinc-500 hover:bg-red-500/10 hover:text-red-400"
               >
                 <Trash2 className="h-4 w-4" />
               </button>
@@ -67,12 +70,12 @@ export default function CarrelloPage() {
       </div>
 
       <div className="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-6">
-        <div className="flex justify-between items-center mb-6">
+        <div className="mb-6 flex items-center justify-between">
           <span className="text-zinc-400">Totale</span>
           <span className="text-2xl font-bold text-white">€{total.toFixed(2)}</span>
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-3">
+        <div className="flex flex-col gap-3 sm:flex-row">
           <button
             onClick={clearCart}
             className="rounded-full border border-zinc-600 px-6 py-3 text-sm font-medium text-zinc-300 hover:bg-zinc-800"
@@ -81,7 +84,7 @@ export default function CarrelloPage() {
           </button>
           <Link
             href="/checkout"
-            className="flex-1 text-center rounded-full bg-gradient-to-r from-violet-600 to-cyan-500 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-violet-500/25"
+            className="flex-1 rounded-full bg-gradient-to-r from-violet-600 to-cyan-500 px-6 py-3 text-center text-sm font-semibold text-white shadow-lg shadow-violet-500/25"
           >
             Procedi al checkout
           </Link>

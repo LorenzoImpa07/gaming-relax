@@ -1,24 +1,30 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
-import { Service } from "@/data/services";
+import { Service, ServicePlan } from "@/data/services";
 
 export type CartItem = {
   service: Service;
   quantity: number;
+  planId?: string;
+  planName?: string;
 };
 
 type CartContextType = {
   items: CartItem[];
-  addItem: (service: Service) => void;
-  removeItem: (serviceId: string) => void;
-  updateQuantity: (serviceId: string, quantity: number) => void;
+  addItem: (service: Service, plan?: ServicePlan | null) => void;
+  removeItem: (serviceId: string, planId?: string) => void;
+  updateQuantity: (serviceId: string, quantity: number, planId?: string) => void;
   clearCart: () => void;
   total: number;
   count: number;
 };
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
+
+function matches(i: CartItem, serviceId: string, planId?: string) {
+  return i.service.id === serviceId && (i.planId || undefined) === (planId || undefined);
+}
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
@@ -40,29 +46,35 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
   }, [items, loaded]);
 
-  const addItem = (service: Service) => {
+  const addItem = (service: Service, plan?: ServicePlan | null) => {
+    const planId = plan?.id;
+    const planName = plan?.name;
+    const priced: Service = plan
+      ? { ...service, price: plan.price, name: `${service.name} — ${plan.name}` }
+      : service;
+
     setItems((prev) => {
-      const existing = prev.find((i) => i.service.id === service.id);
+      const existing = prev.find((i) => matches(i, service.id, planId));
       if (existing) {
         return prev.map((i) =>
-          i.service.id === service.id ? { ...i, quantity: i.quantity + 1 } : i
+          matches(i, service.id, planId) ? { ...i, quantity: i.quantity + 1 } : i
         );
       }
-      return [...prev, { service, quantity: 1 }];
+      return [...prev, { service: priced, quantity: 1, planId, planName }];
     });
   };
 
-  const removeItem = (serviceId: string) => {
-    setItems((prev) => prev.filter((i) => i.service.id !== serviceId));
+  const removeItem = (serviceId: string, planId?: string) => {
+    setItems((prev) => prev.filter((i) => !matches(i, serviceId, planId)));
   };
 
-  const updateQuantity = (serviceId: string, quantity: number) => {
+  const updateQuantity = (serviceId: string, quantity: number, planId?: string) => {
     if (quantity < 1) {
-      removeItem(serviceId);
+      removeItem(serviceId, planId);
       return;
     }
     setItems((prev) =>
-      prev.map((i) => (i.service.id === serviceId ? { ...i, quantity } : i))
+      prev.map((i) => (matches(i, serviceId, planId) ? { ...i, quantity } : i))
     );
   };
 

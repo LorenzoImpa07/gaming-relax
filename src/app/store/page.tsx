@@ -4,12 +4,10 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Check, ShoppingCart } from "lucide-react";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, onSnapshot } from "firebase/firestore";
 import { services as staticServices, type Service } from "@/data/services";
 import { useCart } from "@/context/CartContext";
 import { db } from "@/lib/firebase";
-
-const EUR = "\u20AC";
 
 function normalize(raw: Record<string, unknown>, id: string): Service {
   const features = raw.features;
@@ -17,6 +15,7 @@ function normalize(raw: Record<string, unknown>, id: string): Service {
   if (Array.isArray(features)) feats = features as string[];
   else if (typeof features === "string")
     feats = features.split("\n").map((s) => s.trim()).filter(Boolean);
+
   return {
     id,
     name: String(raw.name || "Servizio"),
@@ -39,8 +38,9 @@ export default function StorePage() {
   const [maxPrice, setMaxPrice] = useState(1000);
 
   useEffect(() => {
-    getDocs(collection(db, "site_services"))
-      .then((snap) => {
+    const unsub = onSnapshot(
+      collection(db, "site_services"),
+      (snap) => {
         if (snap.empty) return;
         const fromDb = snap.docs.map((d) =>
           normalize(d.data() as Record<string, unknown>, d.id)
@@ -48,11 +48,14 @@ export default function StorePage() {
         setList(fromDb);
         const prices = fromDb.map((s) => s.price);
         if (prices.length) setMaxPrice(Math.max(...prices, 100));
-      })
-      .catch(() => {});
+      },
+      () => {}
+    );
+    return () => unsub();
   }, []);
 
   const priceCeiling = useMemo(() => Math.max(...list.map((s) => s.price), 100), [list]);
+
   const filtered = useMemo(() => {
     return list.filter((s) => {
       const avail = s.available !== false;
@@ -71,19 +74,19 @@ export default function StorePage() {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="text-center mb-12"
+        className="mb-12 text-center"
       >
         <h1 className="text-3xl font-bold text-white sm:text-4xl text-glow">Store Servizi</h1>
-        <p className="mt-4 text-zinc-400 max-w-2xl mx-auto">
-          {"Scegli il pacchetto pi\u00f9 adatto. Prezzi trasparenti e supporto incluso."}
+        <p className="mx-auto mt-4 max-w-2xl text-zinc-400">
+          Scegli il pacchetto più adatto. Prezzi trasparenti e supporto incluso.
         </p>
       </motion.div>
 
       <div className="grid gap-8 lg:grid-cols-[240px_1fr]">
-        <aside className="h-fit sticky top-24 space-y-6 rounded-2xl border border-zinc-800 bg-zinc-900/50 p-5 box-glow">
+        <aside className="sticky top-24 h-fit space-y-6 rounded-2xl border border-zinc-800 bg-zinc-900/50 p-5 box-glow">
           <div>
             <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-fuchsia-400">
-              {"Disponibilit\u00e0"}
+              Disponibilità
             </p>
             <label className="mb-2 flex cursor-pointer items-center gap-2 text-sm text-zinc-300">
               <input
@@ -107,11 +110,8 @@ export default function StorePage() {
           <div>
             <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-fuchsia-400">Prezzo</p>
             <div className="mb-2 flex justify-between text-sm text-zinc-400">
-              <span>{EUR}0</span>
-              <span>
-                {EUR}
-                {maxPrice}
-              </span>
+              <span>€0</span>
+              <span>€{maxPrice}</span>
             </div>
             <input
               type="range"
@@ -142,7 +142,7 @@ export default function StorePage() {
             >
               {service.popular && (
                 <span className="absolute -top-3 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded-full bg-gradient-to-r from-violet-600 to-cyan-500 px-3 py-0.5 text-xs font-semibold text-white btn-glow">
-                  {"Pi\u00f9 richiesto"}
+                  Più richiesto
                 </span>
               )}
               {service.available === false && (
@@ -159,21 +159,14 @@ export default function StorePage() {
               <div className="mb-5 mt-4">
                 {service.discountPercent && service.discountPercent > 0 ? (
                   <>
-                    <span className="mr-2 text-lg text-zinc-500 line-through">
-                      {EUR}
-                      {service.price}
-                    </span>
+                    <span className="mr-2 text-lg text-zinc-500 line-through">€{service.price}</span>
                     <span className="text-3xl font-bold text-white">
-                      {EUR}
-                      {Math.round(service.price * (1 - service.discountPercent / 100) * 100) / 100}
+                      €{Math.round(service.price * (1 - service.discountPercent / 100) * 100) / 100}
                     </span>
                     <span className="ml-2 text-xs text-green-400">-{service.discountPercent}%</span>
                   </>
                 ) : (
-                  <span className="text-3xl font-bold text-white">
-                    {EUR}
-                    {service.price}
-                  </span>
+                  <span className="text-3xl font-bold text-white">€{service.price}</span>
                 )}
                 <span className="ml-1 text-sm text-zinc-500">una tantum</span>
               </div>

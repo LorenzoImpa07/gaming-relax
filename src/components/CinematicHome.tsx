@@ -213,23 +213,6 @@ export function CinematicHome() {
         style={{ scaleX: progressBar }}
       />
 
-      <motion.div
-        className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 sm:bottom-8"
-        initial={{ opacity: 0, y: 24 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 1.2, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-      >
-        <Link
-          href="/contatti"
-          className="group flex items-center gap-2.5 rounded-full border border-white/20 bg-white px-5 py-2.5 text-sm font-semibold text-zinc-900 shadow-[0_12px_40px_rgba(0,0,0,0.55)] transition hover:scale-[1.04] hover:shadow-[0_14px_48px_rgba(139,92,246,0.4)]"
-        >
-          <span className="flex h-5 w-5 items-center justify-center rounded-full bg-violet-600 text-white transition group-hover:scale-110">
-            <MessageSquare className="h-3 w-3" />
-          </span>
-          Richiedi preventivo
-        </Link>
-      </motion.div>
-
       <section ref={heroRef} className="relative h-[100svh] overflow-hidden">
         <motion.div style={{ scale: heroScale, y: heroY }} className="absolute inset-0 will-change-transform">
           <SceneImage src={IMG.hero} alt="Laptop e codice" priority />

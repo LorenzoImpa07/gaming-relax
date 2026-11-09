@@ -24,6 +24,7 @@ import {
   Database,
   BadgeCheck,
   Radio,
+  Bot,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { isAdminEmail } from "@/lib/admin";
@@ -51,6 +52,7 @@ const navGroups = [
     title: "Contenuti",
     items: [
       { href: "/admin/banner", label: "Banner home", icon: Radio },
+      { href: "/admin/supporto", label: "Assistente chat", icon: Bot },
       { href: "/admin/team", label: "Team", icon: Users },
       { href: "/admin/partner", label: "Partner", icon: Handshake },
       { href: "/admin/novita", label: "Novità", icon: Megaphone },

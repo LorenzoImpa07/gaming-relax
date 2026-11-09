@@ -8,8 +8,6 @@ import {
   useScroll,
   useTransform,
   useSpring,
-  useMotionValue,
-  useMotionTemplate,
   AnimatePresence,
 } from "framer-motion";
 import {
@@ -19,13 +17,11 @@ import {
   Globe,
   Zap,
   Cpu,
-  Terminal,
   Braces,
+  Shield,
   GitBranch,
   Layers,
-  Shield,
   Sparkles,
-  Play,
 } from "lucide-react";
 import { TeamSection } from "@/components/TeamSection";
 import { Partners } from "@/components/Partners";
@@ -38,332 +34,320 @@ const IMG = {
 };
 
 const STACK = [
-  "TypeScript", "Next.js", "React", "Node.js", "Firebase", "Tailwind",
-  "Framer Motion", "Discord API", "PostgreSQL", "Vercel", "GraphQL", "CI/CD",
+  "TypeScript",
+  "Next.js",
+  "React",
+  "Node.js",
+  "Firebase",
+  "Tailwind",
+  "Framer Motion",
+  "Discord API",
+  "PostgreSQL",
+  "Vercel",
 ];
 
-const FLOAT_SNIPPETS = [
-  "const ok = true", "await ship()", "type Result = Ok", "export default",
-  "npm run build", "git push origin", "useEffect(() =>", "framer-motion",
-];
-
-const WORDS = ["Codice.", "Design.", "Deploy.", "Crescita."];
-
-function TypeLine() {
-  const lines = [
-    'await deploy({ env: "production" })',
-    "→ live · 42s · zero downtime",
-  ];
-  const [li, setLi] = useState(0);
-  const [n, setN] = useState(0);
-  const full = lines[li];
-  useEffect(() => {
-    if (n >= full.length) {
-      const t = setTimeout(() => {
-        setLi((x) => (x + 1) % lines.length);
-        setN(0);
-      }, 1800);
-      return () => clearTimeout(t);
-    }
-    const t = setTimeout(() => setN((x) => x + 1), 22);
-    return () => clearTimeout(t);
-  }, [n, full.length, li]);
-  return (
-    <span className="font-mono text-[11px] text-emerald-300 sm:text-xs">
-      {full.slice(0, n)}
-      <span className="ml-0.5 inline-block h-3.5 w-[2px] animate-pulse bg-emerald-300 align-middle" />
-    </span>
-  );
-}
-
-function FloatingCode() {
-  return (
-    <div className="pointer-events-none absolute inset-0 overflow-hidden opacity-40">
-      {FLOAT_SNIPPETS.map((s, i) => (
-        <motion.span
-          key={s}
-          className="absolute font-mono text-[10px] text-violet-300/50 sm:text-xs"
-          style={{ left: `${8 + (i * 12) % 80}%`, top: `${10 + (i * 17) % 75}%` }}
-          animate={{ y: [0, -18, 0], opacity: [0.2, 0.55, 0.2] }}
-          transition={{ duration: 5 + (i % 4), repeat: Infinity, delay: i * 0.4, ease: "easeInOut" }}
-        >
-          {s}
-        </motion.span>
-      ))}
-    </div>
-  );
-}
-
-function TiltCard({ children, className = "" }: { children: React.ReactNode; className?: string }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const rx = useMotionValue(0);
-  const ry = useMotionValue(0);
-  const glowX = useMotionValue(50);
-  const glowY = useMotionValue(50);
-  const bg = useMotionTemplate`radial-gradient(500px circle at ${glowX}% ${glowY}%, rgba(139,92,246,0.22), transparent 45%)`;
-  return (
-    <motion.div
-      ref={ref}
-      className={`relative ${className}`}
-      style={{ rotateX: rx, rotateY: ry, transformStyle: "preserve-3d" }}
-      onMouseMove={(e) => {
-        const r = ref.current?.getBoundingClientRect();
-        if (!r) return;
-        const px = (e.clientX - r.left) / r.width;
-        const py = (e.clientY - r.top) / r.height;
-        ry.set((px - 0.5) * 10);
-        rx.set((0.5 - py) * 8);
-        glowX.set(px * 100);
-        glowY.set(py * 100);
-      }}
-      onMouseLeave={() => { rx.set(0); ry.set(0); }}
-    >
-      <motion.div
-        className="pointer-events-none absolute inset-0 rounded-[inherit] opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-        style={{ background: bg }}
-      />
-      {children}
-    </motion.div>
-  );
-}
-
-function CodePanel() {
-  return (
-    <div className="overflow-hidden rounded-2xl border border-white/12 bg-[#080a10]/95 shadow-[0_0_80px_rgba(139,92,246,0.2)] backdrop-blur-xl">
-      <div className="flex items-center gap-2 border-b border-white/5 px-4 py-3">
-        <span className="h-2.5 w-2.5 rounded-full bg-red-400" />
-        <span className="h-2.5 w-2.5 rounded-full bg-amber-400" />
-        <span className="h-2.5 w-2.5 rounded-full bg-emerald-400" />
-        <span className="ml-2 font-mono text-[10px] text-zinc-500">launch.ts · production</span>
-        <span className="ml-auto flex items-center gap-1.5 rounded-full bg-emerald-500/15 px-2.5 py-0.5 font-mono text-[10px] text-emerald-300">
-          <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" />
-          online
-        </span>
-      </div>
-      <div className="space-y-1.5 p-5 font-mono text-[11px] leading-7 sm:text-xs">
-        <p>
-          <span className="text-fuchsia-400">import</span>{" "}
-          <span className="text-sky-300">{`{ ship }`}</span>{" "}
-          <span className="text-fuchsia-400">from</span>{" "}
-          <span className="text-emerald-300">"@gr/core"</span>
-        </p>
-        <p className="text-zinc-600">// typed · tested · measured</p>
-        <p>
-          <span className="text-fuchsia-400">export async function</span>{" "}
-          <span className="text-amber-300">launch</span>
-          <span className="text-zinc-400">()</span> {"{"}
-        </p>
-        <p className="pl-4">
-          <span className="text-fuchsia-400">const</span>{" "}
-          <span className="text-violet-300">result</span> = <TypeLine />
-        </p>
-        <p className="pl-4">
-          <span className="text-fuchsia-400">return</span>{" "}
-          <span className="text-violet-300">result</span>
-        </p>
-        <p>{"}"}</p>
-        <div className="mt-3 flex flex-wrap gap-2 border-t border-white/5 pt-3">
-          {["lint ✓", "types ✓", "tests ✓", "deploy ✓"].map((b) => (
-            <span key={b} className="rounded-md border border-emerald-500/20 bg-emerald-500/10 px-2 py-0.5 text-[10px] text-emerald-300">{b}</span>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
+const WORDS = ["Codice.", "Design.", "Prodotti.", "Risultati."];
 
 function WordCycle() {
   const [i, setI] = useState(0);
   useEffect(() => {
-    const t = setInterval(() => setI((x) => (x + 1) % WORDS.length), 2200);
+    const t = setInterval(() => setI((x) => (x + 1) % WORDS.length), 2400);
     return () => clearInterval(t);
   }, []);
   return (
-    <span className="relative inline-block h-[1.15em] overflow-hidden align-bottom">
+    <span className="relative inline-block h-[1.1em] min-w-[7ch] overflow-hidden align-bottom">
       <AnimatePresence mode="wait">
         <motion.span
           key={WORDS[i]}
-          initial={{ y: 28, opacity: 0 }}
+          initial={{ y: "100%", opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          exit={{ y: -28, opacity: 0 }}
-          transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-          className="block bg-gradient-to-r from-violet-200 via-fuchsia-200 to-cyan-200 bg-clip-text text-transparent"
+          exit={{ y: "-100%", opacity: 0 }}
+          transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+          className="absolute left-0 top-0 bg-gradient-to-r from-violet-200 via-fuchsia-200 to-cyan-200 bg-clip-text text-transparent"
         >
           {WORDS[i]}
         </motion.span>
       </AnimatePresence>
+      <span className="invisible">{WORDS[0]}</span>
     </span>
   );
 }
 
-const CAPABILITIES = [
-  { icon: Globe, title: "Web & App", text: "Siti, dashboard, SaaS. Next.js, design system, SEO.", href: "/custom", tag: "full-stack" },
-  { icon: Bot, title: "Bot Discord", text: "Economia, ticket, ranking, pannelli moderatori.", href: "/store", tag: "realtime" },
-  { icon: Zap, title: "Automazioni", text: "API, webhook, pipeline. Meno click, più affidabilità.", href: "/custom", tag: "ops" },
-  { icon: Cpu, title: "Software custom", text: "Tool e gestionali su misura. Documentati, manutenibili.", href: "/custom", tag: "bespoke" },
-];
+function TypeDeploy() {
+  const full = 'await ship({ env: "prod" }) → live';
+  const [n, setN] = useState(0);
+  useEffect(() => {
+    if (n >= full.length) {
+      const t = setTimeout(() => setN(0), 2000);
+      return () => clearTimeout(t);
+    }
+    const t = setTimeout(() => setN((x) => x + 1), 30);
+    return () => clearTimeout(t);
+  }, [n]);
+  return (
+    <span className="font-mono text-emerald-300">
+      {full.slice(0, n)}
+      <span className="ml-0.5 inline-block h-3 w-0.5 animate-pulse bg-emerald-300 align-middle" />
+    </span>
+  );
+}
 
 export function CinematicHome() {
   const root = useRef<HTMLDivElement>(null);
   const hero = useRef<HTMLDivElement>(null);
   const story = useRef<HTMLDivElement>(null);
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
 
-  const { scrollYProgress: page } = useScroll({ target: root, offset: ["start start", "end end"] });
-  const { scrollYProgress: heroP } = useScroll({ target: hero, offset: ["start start", "end start"] });
-  const { scrollYProgress: storyP } = useScroll({ target: story, offset: ["start end", "end start"] });
+  const { scrollYProgress: page } = useScroll({
+    target: root,
+    offset: ["start start", "end end"],
+  });
+  const { scrollYProgress: heroP } = useScroll({
+    target: hero,
+    offset: ["start start", "end start"],
+  });
+  const { scrollYProgress: storyP } = useScroll({
+    target: story,
+    offset: ["start end", "end start"],
+  });
 
-  const bar = useSpring(page, { stiffness: 100, damping: 28 });
-  const heroOp = useTransform(heroP, [0, 0.5], [1, 0]);
-  const heroY = useTransform(heroP, [0, 1], [0, 120]);
-  const heroScale = useTransform(heroP, [0, 1], [1, 1.15]);
-  const blobOp = useTransform(heroP, [0, 0.6], [1, 0]);
-  const line1 = useTransform(storyP, [0.06, 0.18, 0.28, 0.38], [0, 1, 1, 0]);
-  const line2 = useTransform(storyP, [0.26, 0.38, 0.48, 0.58], [0, 1, 1, 0]);
-  const line3 = useTransform(storyP, [0.46, 0.58, 0.72, 0.88], [0, 1, 1, 0.15]);
-  const storyScale = useTransform(storyP, [0, 1], [1.25, 1]);
-  const codeX = useTransform(storyP, [0, 1], [50, -30]);
-  const codeRot = useTransform(storyP, [0, 1], [4, -2]);
-  const spotlight = useMotionTemplate`radial-gradient(600px circle at ${mouseX}px ${mouseY}px, rgba(139,92,246,0.12), transparent 40%)`;
+  const bar = useSpring(page, { stiffness: 90, damping: 28 });
+  const heroOp = useTransform(heroP, [0, 0.55], [1, 0]);
+  const heroY = useTransform(heroP, [0, 1], [0, 80]);
+  const heroScale = useTransform(heroP, [0, 1], [1, 1.1]);
+
+  const s1 = useTransform(storyP, [0.08, 0.2, 0.3, 0.4], [0, 1, 1, 0]);
+  const s2 = useTransform(storyP, [0.28, 0.4, 0.5, 0.6], [0, 1, 1, 0]);
+  const s3 = useTransform(storyP, [0.48, 0.6, 0.75, 0.9], [0, 1, 1, 0.2]);
+  const imgScale = useTransform(storyP, [0, 1], [1.2, 1]);
 
   return (
-    <div
-      ref={root}
-      className="relative overflow-x-hidden bg-[#020205] text-white"
-      onMouseMove={(e) => { mouseX.set(e.clientX); mouseY.set(e.clientY); }}
-    >
-      <motion.div className="pointer-events-none fixed inset-0 z-[1] hidden lg:block" style={{ background: spotlight }} />
-      <motion.div className="fixed left-0 top-0 z-[80] h-[2.5px] origin-left bg-gradient-to-r from-violet-400 via-fuchsia-400 to-cyan-300 shadow-[0_0_12px_rgba(167,139,250,0.8)]" style={{ scaleX: bar }} />
-      <div className="pointer-events-none fixed inset-0 z-0 opacity-30">
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.045)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.045)_1px,transparent_1px)] bg-[size:56px_56px] [mask-image:radial-gradient(ellipse_at_center,black_10%,transparent_72%)]" />
-      </div>
+    <div ref={root} className="relative bg-[#0a0614] text-white">
+      <motion.div
+        className="fixed left-0 top-0 z-[80] h-[2px] origin-left bg-gradient-to-r from-violet-400 via-fuchsia-400 to-cyan-300"
+        style={{ scaleX: bar }}
+      />
 
       <section ref={hero} className="relative min-h-[100svh] overflow-hidden">
         <motion.div style={{ scale: heroScale }} className="absolute inset-0">
-          <Image src={IMG.hero} alt="" fill priority className="object-cover opacity-[0.22]" sizes="100vw" />
-          <div className="absolute inset-0 bg-gradient-to-b from-[#020205]/40 via-[#020205]/80 to-[#020205]" />
+          <Image
+            src={IMG.hero}
+            alt=""
+            fill
+            priority
+            className="object-cover"
+            sizes="100vw"
+          />
+          <div className="absolute inset-0 bg-gradient-to-br from-[#1a0b2e]/85 via-[#0f0a1a]/75 to-[#0a1628]/90" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_20%_30%,rgba(139,92,246,0.35),transparent_50%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_80%_70%,rgba(34,211,238,0.12),transparent_45%)]" />
         </motion.div>
-        <FloatingCode />
-        <motion.div style={{ opacity: blobOp }} className="pointer-events-none absolute -left-40 top-0 h-[520px] w-[520px] rounded-full bg-violet-600/35 blur-[140px]" />
-        <motion.div animate={{ x: [0, 30, 0], y: [0, -20, 0] }} transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }} className="pointer-events-none absolute right-0 top-1/3 h-[400px] w-[400px] rounded-full bg-fuchsia-500/20 blur-[120px]" />
-        <motion.div animate={{ x: [0, -25, 0], y: [0, 25, 0] }} transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }} className="pointer-events-none absolute bottom-10 left-1/3 h-[300px] w-[300px] rounded-full bg-cyan-500/15 blur-[100px]" />
 
-        <motion.div style={{ opacity: heroOp, y: heroY }} className="relative z-10 mx-auto grid min-h-[100svh] max-w-6xl items-center gap-10 px-4 pb-16 pt-28 sm:px-6 lg:grid-cols-[1.1fr_0.9fr]">
-          <div>
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="mb-6 inline-flex items-center gap-2.5 rounded-full border border-white/10 bg-white/5 px-3.5 py-1.5 font-mono text-[11px] text-violet-200 backdrop-blur-md">
-              <span className="relative flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-70" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
-              </span>
-              live · shipping daily
-            </motion.div>
-            <motion.h1 initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1.05, ease: [0.16, 1, 0.3, 1] }} className="text-4xl font-semibold leading-[1.02] tracking-tight sm:text-5xl lg:text-6xl xl:text-[4.5rem]">
-              Costruiamo<br /><WordCycle /><br />
-              <span className="text-white/85">senza compromessi.</span>
-            </motion.h1>
-            <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25, duration: 0.8 }} className="mt-6 max-w-md text-base leading-relaxed text-zinc-400 sm:text-lg">
-              Siti, app, bot e automazioni. TypeScript end-to-end, UI curata, deploy in produzione. Software che si vede — e regge.
-            </motion.p>
-            <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="mt-10 flex flex-wrap gap-3">
-              <Link href="/custom" className="group relative inline-flex items-center gap-2 overflow-hidden rounded-full bg-white px-8 py-3.5 text-sm font-semibold text-zinc-900 shadow-[0_0_50px_rgba(255,255,255,0.2)] transition hover:scale-[1.04]">
-                <span className="absolute inset-0 translate-x-[-100%] bg-gradient-to-r from-transparent via-violet-200/50 to-transparent transition duration-700 group-hover:translate-x-[100%]" />
-                Esplora Custom
-                <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
-              </Link>
-              <Link href="/store" className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-7 py-3.5 text-sm font-medium text-white backdrop-blur-md transition hover:border-violet-400/50 hover:bg-violet-500/15">
-                <Play className="h-3.5 w-3.5 fill-current text-violet-300" />
-                Store
-              </Link>
-            </motion.div>
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }} className="mt-14 grid grid-cols-3 gap-4 border-t border-white/10 pt-8 sm:max-w-md">
-              {[{ k: "TS", v: "Type-safe" }, { k: "∞", v: "Iterazioni" }, { k: "24/7", v: "Assistente" }].map((m) => (
-                <div key={m.k}>
-                  <p className="font-mono text-2xl font-semibold tracking-tight text-white">{m.k}</p>
-                  <p className="text-[11px] text-zinc-500">{m.v}</p>
+        <motion.div
+          style={{ opacity: heroOp, y: heroY }}
+          className="relative z-10 mx-auto flex min-h-[100svh] max-w-6xl flex-col justify-center px-4 pb-20 pt-28 sm:px-6"
+        >
+          <div className="grid items-center gap-12 lg:grid-cols-[1.15fr_0.85fr]">
+            <div>
+              <motion.p
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 font-mono text-[11px] text-violet-100 backdrop-blur-md"
+              >
+                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" />
+                Software studio · Italia
+              </motion.p>
+
+              <motion.h1
+                initial={{ opacity: 0, y: 28 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+                className="text-4xl font-semibold leading-[1.05] tracking-tight sm:text-5xl lg:text-6xl xl:text-7xl"
+              >
+                Costruiamo
+                <br />
+                <WordCycle />
+                <br />
+                <span className="text-white/80">che contano.</span>
+              </motion.h1>
+
+              <motion.p
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="mt-6 max-w-lg text-base leading-relaxed text-zinc-200/90 sm:text-lg"
+              >
+                Siti web, applicazioni, bot Discord e automazioni. Design chiaro,
+                codice solido, online in produzione.
+              </motion.p>
+
+              <motion.div
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.35 }}
+                className="mt-9 flex flex-wrap gap-3"
+              >
+                <Link
+                  href="/custom"
+                  className="group inline-flex items-center gap-2 rounded-full bg-white px-7 py-3.5 text-sm font-semibold text-zinc-900 shadow-lg shadow-violet-500/20 transition hover:scale-[1.03]"
+                >
+                  Vedi Custom
+                  <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
+                </Link>
+                <Link
+                  href="/store"
+                  className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-7 py-3.5 text-sm font-medium text-white backdrop-blur-md transition hover:bg-white/20"
+                >
+                  Store
+                </Link>
+              </motion.div>
+            </div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3, duration: 0.9 }}
+              className="relative hidden lg:block"
+            >
+              <div className="overflow-hidden rounded-2xl border border-white/20 bg-white/10 shadow-2xl shadow-violet-900/40 backdrop-blur-xl">
+                <div className="flex items-center gap-2 border-b border-white/10 px-4 py-2.5">
+                  <span className="h-2.5 w-2.5 rounded-full bg-red-400" />
+                  <span className="h-2.5 w-2.5 rounded-full bg-amber-400" />
+                  <span className="h-2.5 w-2.5 rounded-full bg-emerald-400" />
+                  <span className="ml-2 font-mono text-[10px] text-white/50">ship.ts</span>
                 </div>
-              ))}
+                <div className="space-y-1 p-5 font-mono text-xs leading-7">
+                  <p>
+                    <span className="text-fuchsia-300">export async</span>{" "}
+                    <span className="text-sky-200">function</span>{" "}
+                    <span className="text-amber-200">launch</span>() {"{"}
+                  </p>
+                  <p className="pl-3">
+                    <span className="text-fuchsia-300">const</span> r = <TypeDeploy />
+                  </p>
+                  <p className="pl-3">
+                    <span className="text-fuchsia-300">return</span> r
+                  </p>
+                  <p>{"}"}</p>
+                  <p className="pt-2 text-white/40">// typed · tested · live</p>
+                </div>
+              </div>
             </motion.div>
           </div>
-          <motion.div initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3, duration: 1.1, ease: [0.16, 1, 0.3, 1] }} className="relative hidden lg:block" style={{ perspective: 1400 }}>
-            <div className="absolute -inset-8 rounded-[2.5rem] bg-gradient-to-br from-violet-600/30 via-fuchsia-500/15 to-cyan-400/20 blur-3xl" />
-            <TiltCard className="group"><CodePanel /></TiltCard>
-          </motion.div>
         </motion.div>
-        <motion.div className="absolute bottom-8 left-1/2 z-20 flex -translate-x-1/2 flex-col items-center gap-2" animate={{ y: [0, 8, 0] }} transition={{ duration: 2.2, repeat: Infinity }}>
-          <span className="font-mono text-[9px] uppercase tracking-[0.4em] text-white/35">scroll</span>
-          <div className="h-8 w-[1px] bg-gradient-to-b from-white/40 to-transparent" />
-        </motion.div>
+
+        <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#1a0f2e] to-transparent" />
       </section>
 
-      <div className="relative z-10 overflow-hidden border-y border-white/5 bg-zinc-950/90 py-4">
-        <div className="flex w-max animate-[marquee_28s_linear_infinite] gap-12">
+      <div className="relative overflow-hidden border-y border-white/10 bg-gradient-to-r from-[#1a0f2e] via-[#140c24] to-[#0f1a2e] py-4">
+        <div className="flex w-max animate-[marquee_30s_linear_infinite] gap-10">
           {[...STACK, ...STACK].map((t, i) => (
-            <span key={`${t}-${i}`} className="inline-flex items-center gap-2.5 font-mono text-sm text-zinc-500">
-              <Braces className="h-3.5 w-3.5 text-violet-400/80" />{t}
+            <span
+              key={`${t}-${i}`}
+              className="inline-flex items-center gap-2 font-mono text-sm text-violet-200/60"
+            >
+              <Braces className="h-3.5 w-3.5 text-violet-400" />
+              {t}
             </span>
           ))}
         </div>
       </div>
 
-      <section ref={story} className="relative z-10 h-[240svh]">
-        <div className="sticky top-0 flex h-[100svh] items-center overflow-hidden">
-          <motion.div style={{ scale: storyScale }} className="absolute inset-0">
-            <Image src={IMG.code} alt="" fill className="object-cover opacity-35" sizes="100vw" />
-            <div className="absolute inset-0 bg-[#020205]/70" />
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_30%_50%,rgba(109,40,217,0.35),transparent_55%)]" />
+      <section ref={story} className="relative h-[200svh]">
+        <div className="sticky top-0 h-[100svh] overflow-hidden">
+          <motion.div style={{ scale: imgScale }} className="absolute inset-0">
+            <Image src={IMG.code} alt="" fill className="object-cover" sizes="100vw" />
+            <div className="absolute inset-0 bg-gradient-to-br from-[#1a0b2e]/80 via-[#0f0a1a]/70 to-[#0a1628]/85" />
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(139,92,246,0.25),transparent_60%)]" />
           </motion.div>
-          <div className="relative z-10 mx-auto grid w-full max-w-6xl gap-12 px-4 sm:px-6 lg:grid-cols-2 lg:items-center">
-            <div className="relative min-h-[240px] sm:min-h-[300px]">
-              <motion.h2 style={{ opacity: line1 }} className="absolute inset-0 flex flex-col justify-center font-serif text-3xl font-light leading-[1.1] sm:text-5xl lg:text-6xl">
-                Codice leggibile.<span className="mt-2 italic text-white/65">Decisioni esplicite.</span>
+          <div className="relative z-10 flex h-full items-center justify-center px-6">
+            <div className="relative h-48 w-full max-w-3xl text-center sm:h-56">
+              <motion.h2
+                style={{ opacity: s1 }}
+                className="absolute inset-0 flex flex-col items-center justify-center font-serif text-3xl font-light sm:text-5xl"
+              >
+                Idee chiare.
+                <span className="mt-2 italic text-violet-200/80">Codice pulito.</span>
               </motion.h2>
-              <motion.h2 style={{ opacity: line2 }} className="absolute inset-0 flex flex-col justify-center font-serif text-3xl font-light leading-[1.1] sm:text-5xl lg:text-6xl">
-                UI non è<span className="mt-2 italic text-violet-200/90">un dopo pensiero.</span>
+              <motion.h2
+                style={{ opacity: s2 }}
+                className="absolute inset-0 flex flex-col items-center justify-center font-serif text-3xl font-light sm:text-5xl"
+              >
+                UI curata.
+                <span className="mt-2 italic text-fuchsia-200/80">Risultati reali.</span>
               </motion.h2>
-              <motion.h2 style={{ opacity: line3 }} className="absolute inset-0 flex flex-col justify-center font-serif text-3xl font-light leading-[1.1] sm:text-5xl lg:text-6xl">
-                Deploy, non demo.<span className="mt-2 italic text-cyan-200/90">In produzione.</span>
+              <motion.h2
+                style={{ opacity: s3 }}
+                className="absolute inset-0 flex flex-col items-center justify-center font-serif text-3xl font-light sm:text-5xl"
+              >
+                Dal brief
+                <span className="mt-2 italic text-cyan-200/80">al prodotto online.</span>
               </motion.h2>
             </div>
-            <motion.div style={{ x: codeX, rotate: codeRot }} className="hidden lg:block">
-              <div className="rounded-2xl border border-white/12 bg-black/60 p-6 font-mono text-xs leading-7 shadow-2xl backdrop-blur-xl">
-                <p className="mb-2 text-zinc-600">// principles.ts</p>
-                <p><span className="text-fuchsia-400">export const</span> <span className="text-sky-300">craft</span> = [</p>
-                <p className="pl-4 text-emerald-300">"type everything",</p>
-                <p className="pl-4 text-emerald-300">"ship small & often",</p>
-                <p className="pl-4 text-emerald-300">"own the prod box",</p>
-                <p className="pl-4 text-emerald-300">"design with code"</p>
-                <p>];</p>
-                <p className="mt-4 text-zinc-600">// no magic. just skill.</p>
-              </div>
-            </motion.div>
           </div>
+          <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-[#120a22] to-transparent" />
         </div>
       </section>
 
-      <section className="relative z-10 border-t border-white/5 px-4 py-24 sm:px-6 sm:py-32">
+      <section className="relative bg-gradient-to-b from-[#120a22] via-[#140c28] to-[#0e1228] px-4 py-24 sm:px-6 sm:py-28">
         <div className="mx-auto max-w-6xl">
-          <motion.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="mb-14">
-            <p className="mb-3 font-mono text-[11px] uppercase tracking-[0.3em] text-violet-400">capabilities</p>
-            <h2 className="text-3xl font-semibold tracking-tight sm:text-5xl">
-              Quattro linee.<span className="block text-zinc-500">Uno standard alto.</span>
+          <div className="mb-12 max-w-2xl">
+            <p className="mb-2 font-mono text-[11px] uppercase tracking-[0.25em] text-violet-300">
+              Cosa facciamo
+            </p>
+            <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">
+              Quattro linee di lavoro.
+              <span className="mt-1 block text-lg font-normal text-violet-200/50 sm:text-xl">
+                Un solo standard di qualità.
+              </span>
             </h2>
-          </motion.div>
+          </div>
+
           <div className="grid gap-4 sm:grid-cols-2">
-            {CAPABILITIES.map((c, i) => (
-              <motion.div key={c.title} initial={{ opacity: 0, y: 32 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-40px" }} transition={{ delay: i * 0.08, duration: 0.55 }}>
-                <Link href={c.href} className="group relative flex h-full flex-col overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-white/[0.08] via-white/[0.02] to-transparent p-8 transition duration-500 hover:border-violet-500/50 hover:shadow-[0_25px_80px_rgba(139,92,246,0.18)]">
-                  <div className="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-violet-600/0 blur-3xl transition duration-500 group-hover:bg-violet-600/25" />
-                  <div className="relative flex items-start justify-between">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-violet-300 transition group-hover:scale-110 group-hover:border-violet-400/50 group-hover:bg-violet-500/25">
-                      <c.icon className="h-5 w-5" />
-                    </div>
-                    <span className="rounded-full border border-white/10 px-2.5 py-1 font-mono text-[10px] text-zinc-500">{c.tag}</span>
+            {[
+              {
+                icon: Globe,
+                title: "Siti & Web App",
+                text: "Landing, corporate, dashboard, SaaS. Performance e conversione.",
+                href: "/custom",
+              },
+              {
+                icon: Bot,
+                title: "Bot Discord",
+                text: "Economia, ticket, moderazione, pannelli. Per community che crescono.",
+                href: "/store",
+              },
+              {
+                icon: Zap,
+                title: "Automazioni",
+                text: "API, webhook, pipeline. Meno lavoro ripetitivo, più affidabilità.",
+                href: "/custom",
+              },
+              {
+                icon: Cpu,
+                title: "Software custom",
+                text: "Tool interni e gestionali. Su misura, documentati, manutenibili.",
+                href: "/custom",
+              },
+            ].map((c, i) => (
+              <motion.div
+                key={c.title}
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.06 }}
+              >
+                <Link
+                  href={c.href}
+                  className="group flex h-full flex-col rounded-2xl border border-white/10 bg-white/[0.06] p-6 backdrop-blur-sm transition hover:border-violet-400/40 hover:bg-violet-500/10"
+                >
+                  <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-violet-500/20 text-violet-200 transition group-hover:bg-violet-500/30">
+                    <c.icon className="h-5 w-5" />
                   </div>
-                  <h3 className="relative mt-6 text-2xl font-semibold">{c.title}</h3>
-                  <p className="relative mt-2 flex-1 text-sm leading-relaxed text-zinc-400">{c.text}</p>
-                  <span className="relative mt-8 inline-flex items-center gap-1.5 text-sm font-medium text-violet-300">
-                    Apri <ArrowUpRight className="h-4 w-4 transition group-hover:translate-x-1 group-hover:-translate-y-1" />
+                  <h3 className="mt-4 text-xl font-semibold">{c.title}</h3>
+                  <p className="mt-2 flex-1 text-sm leading-relaxed text-zinc-300/80">{c.text}</p>
+                  <span className="mt-5 inline-flex items-center gap-1 text-sm font-medium text-violet-300">
+                    Esplora
+                    <ArrowUpRight className="h-4 w-4 transition group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                   </span>
                 </Link>
               </motion.div>
@@ -372,88 +356,95 @@ export function CinematicHome() {
         </div>
       </section>
 
-      <section className="relative z-10 border-t border-white/5 bg-[#06060a] px-4 py-24 sm:px-6">
-        <div className="mx-auto max-w-6xl">
-          <p className="mb-2 font-mono text-[11px] uppercase tracking-[0.3em] text-cyan-400/90">pipeline</p>
-          <h2 className="mb-12 text-3xl font-semibold sm:text-4xl">Brief → ship</h2>
-          <div className="grid gap-3 md:grid-cols-4">
-            {[["01", "Discovery", "Metriche, vincoli, priorità."], ["02", "Architecture", "Stack, dati, auth, edge."], ["03", "Build", "Tipizzato, testato, UI fina."], ["04", "Ship & care", "Prod, monitor, evolutive."]].map(([n, t, d], i) => (
-              <motion.div key={n} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.07 }} className="group relative overflow-hidden rounded-2xl border border-white/8 bg-black/50 p-6 transition hover:border-violet-500/40">
-                <div className="absolute inset-0 bg-gradient-to-br from-violet-600/0 to-transparent opacity-0 transition group-hover:from-violet-600/15 group-hover:opacity-100" />
-                <p className="relative font-mono text-sm text-violet-400">{n}</p>
-                <h3 className="relative mt-3 text-lg font-medium">{t}</h3>
-                <p className="relative mt-2 text-sm text-zinc-400">{d}</p>
-              </motion.div>
-            ))}
-          </div>
-          <div className="mt-8 grid gap-4 sm:grid-cols-3">
-            {[{ icon: Shield, title: "Produzione vera", text: "Auth, ruoli, edge case. Non solo demo." }, { icon: GitBranch, title: "Codice che dura", text: "TypeScript, struttura chiara, riuso." }, { icon: Layers, title: "Design + code", text: "Nati insieme. Niente mock impossibili." }].map((t) => (
-              <div key={t.title} className="rounded-2xl border border-white/10 bg-gradient-to-b from-white/[0.05] to-transparent p-6">
-                <t.icon className="h-5 w-5 text-cyan-300" />
-                <h3 className="mt-4 font-medium">{t.title}</h3>
-                <p className="mt-2 text-sm text-zinc-400">{t.text}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="relative z-10 border-t border-white/5">
+      <section className="relative bg-gradient-to-b from-[#0e1228] to-[#0c1020]">
         <div className="mx-auto grid max-w-6xl lg:grid-cols-2">
-          <div className="relative min-h-[380px] lg:min-h-[560px]">
+          <div className="relative min-h-[320px] lg:min-h-[480px]">
             <Image src={IMG.desk} alt="" fill className="object-cover" sizes="50vw" />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#020205] via-[#020205]/30 to-transparent lg:bg-gradient-to-r lg:from-transparent lg:via-[#020205]/40 lg:to-[#020205]" />
-            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="absolute bottom-8 left-6 right-6 rounded-2xl border border-white/15 bg-black/60 p-4 font-mono text-[11px] shadow-2xl backdrop-blur-xl sm:text-xs">
-              <p className="text-zinc-500">$ gr ship --env production</p>
-              <p className="text-emerald-400">✓ build · ✓ tests · ✓ live in 42s</p>
-              <p className="text-zinc-600">commit abc123 · main</p>
-            </motion.div>
-          </div>
-          <div className="flex flex-col justify-center px-6 py-16 sm:px-12 lg:py-24">
-            <div className="mb-5 inline-flex w-fit items-center gap-2 rounded-full border border-cyan-500/25 bg-cyan-500/10 px-3 py-1 font-mono text-[10px] text-cyan-300">
-              <Terminal className="h-3 w-3" /> craft over noise
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#0e1228]/40 to-[#0e1228] max-lg:bg-gradient-to-t max-lg:from-[#0e1228] max-lg:via-transparent max-lg:to-transparent" />
+            <div className="absolute bottom-6 left-6 right-6 rounded-xl border border-white/15 bg-[#0a0614]/70 p-3 font-mono text-[11px] backdrop-blur-md sm:text-xs">
+              <p className="text-zinc-400">$ gr ship --env production</p>
+              <p className="text-emerald-300">✓ build · ✓ tests · ✓ live</p>
             </div>
-            <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">Ogni riga<br /><span className="text-zinc-400">ha un motivo.</span></h2>
-            <p className="mt-5 max-w-md text-zinc-400">Non template. Architetture, interfacce e flussi pensati per il carico reale — poi online.</p>
-            <ul className="mt-8 space-y-3.5 text-sm text-zinc-300">
-              {["Stack tipizzato end-to-end", "UI responsive e accessibile", "Deploy e monitoraggio", "Comunicazione diretta"].map((x) => (
-                <li key={x} className="flex items-center gap-3">
-                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-violet-500/20 text-violet-300"><Sparkles className="h-3 w-3" /></span>
-                  {x}
+          </div>
+          <div className="flex flex-col justify-center px-6 py-16 sm:px-10 lg:py-20">
+            <p className="font-mono text-[11px] uppercase tracking-[0.25em] text-cyan-300/80">Metodo</p>
+            <h2 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
+              Brief → architettura → build → ship
+            </h2>
+            <ul className="mt-8 space-y-3">
+              {[
+                "Scope chiaro prima di scrivere codice",
+                "UI e backend progettati insieme",
+                "Consegna in produzione, non solo demo",
+                "Supporto e evolutive se ti servono",
+              ].map((t) => (
+                <li key={t} className="flex gap-3 text-sm text-zinc-300">
+                  <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-violet-400" />
+                  {t}
                 </li>
               ))}
             </ul>
-            <Link href="/chi-siamo" className="mt-10 inline-flex w-fit items-center gap-2 text-sm font-medium text-violet-300 transition hover:gap-3 hover:text-violet-200">
-              Il team <ArrowRight className="h-4 w-4" />
-            </Link>
+            <div className="mt-10 grid grid-cols-3 gap-3">
+              {[
+                { icon: Shield, label: "Produzione" },
+                { icon: GitBranch, label: "Manutenibile" },
+                { icon: Layers, label: "Design+code" },
+              ].map((x) => (
+                <div
+                  key={x.label}
+                  className="rounded-xl border border-white/10 bg-white/5 p-3 text-center"
+                >
+                  <x.icon className="mx-auto h-4 w-4 text-cyan-300" />
+                  <p className="mt-2 text-[11px] text-zinc-400">{x.label}</p>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
 
-      <section className="relative z-10 overflow-hidden border-t border-white/5 px-4 py-32 sm:px-6">
-        <div className="absolute inset-0">
-          <Image src={IMG.neon} alt="" fill className="object-cover opacity-20" sizes="100vw" />
-          <div className="absolute inset-0 bg-[#020205]/85" />
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_20%,rgba(139,92,246,0.4),transparent_50%)]" />
+      <section className="relative overflow-hidden bg-gradient-to-b from-[#0c1020] via-[#1a0b2e] to-[#120a22] px-4 py-28 sm:px-6">
+        <div className="pointer-events-none absolute inset-0">
+          <Image src={IMG.neon} alt="" fill className="object-cover opacity-25" sizes="100vw" />
+          <div className="absolute inset-0 bg-gradient-to-b from-[#0c1020]/90 via-[#1a0b2e]/75 to-[#120a22]" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_40%,rgba(139,92,246,0.35),transparent_55%)]" />
         </div>
-        <div className="relative mx-auto max-w-3xl text-center">
-          <motion.p initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="font-mono text-[11px] uppercase tracking-[0.4em] text-violet-300/80">next commit</motion.p>
-          <motion.h2 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="mt-5 font-serif text-4xl font-light sm:text-6xl">
-            Il progetto<br /><span className="italic text-white/70">parte da qui.</span>
-          </motion.h2>
-          <p className="mx-auto mt-6 max-w-md text-zinc-400">Scope, tempi, prezzo. Chiari. Subito.</p>
-          <div className="mt-12 flex flex-wrap justify-center gap-4">
-            <Link href="/custom" className="group inline-flex items-center gap-2 rounded-full bg-white px-9 py-4 text-sm font-semibold text-zinc-900 shadow-[0_0_60px_rgba(255,255,255,0.15)] transition hover:scale-[1.04]">
-              Catalogo Custom <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
+        <div className="relative mx-auto max-w-2xl text-center">
+          <p className="font-mono text-[11px] uppercase tracking-[0.3em] text-violet-300/90">Inizia qui</p>
+          <h2 className="mt-4 font-serif text-3xl font-light sm:text-5xl">
+            Il tuo prossimo progetto
+            <br />
+            <span className="italic text-violet-200/80">parte da una chiacchierata.</span>
+          </h2>
+          <p className="mx-auto mt-5 max-w-md text-zinc-300/80">
+            Scope, tempi e prezzo chiari. Senza giri di parole.
+          </p>
+          <div className="mt-10 flex flex-wrap justify-center gap-3">
+            <Link
+              href="/custom"
+              className="inline-flex items-center gap-2 rounded-full bg-white px-8 py-3.5 text-sm font-semibold text-zinc-900 transition hover:scale-[1.03]"
+            >
+              Catalogo Custom
+              <ArrowRight className="h-4 w-4" />
             </Link>
-            <Link href="/contatti" className="inline-flex items-center gap-2 rounded-full border border-white/25 px-9 py-4 text-sm font-medium text-white transition hover:bg-white/10">Scrivici</Link>
+            <Link
+              href="/contatti"
+              className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-8 py-3.5 text-sm font-medium text-white backdrop-blur transition hover:bg-white/15"
+            >
+              Contatti
+            </Link>
           </div>
         </div>
+        <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-[#0a0614] to-transparent" />
       </section>
 
-      <div className="relative z-10 bg-[#06060a]"><TeamSection /></div>
-      <div className="relative z-10 border-t border-white/5 bg-[#06060a]"><Partners /></div>
-      <div className="h-20" />
+      <div className="bg-[#0a0614]">
+        <TeamSection />
+      </div>
+      <div className="border-t border-white/5 bg-[#0a0614]">
+        <Partners />
+      </div>
+      <div className="h-16 bg-[#0a0614]" />
     </div>
   );
 }

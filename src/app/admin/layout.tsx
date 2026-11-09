@@ -23,7 +23,7 @@ import {
   Shield,
   Database,
   BadgeCheck,
-  Tags,
+  Radio,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { isAdminEmail } from "@/lib/admin";
@@ -50,11 +50,11 @@ const navGroups = [
   {
     title: "Contenuti",
     items: [
+      { href: "/admin/banner", label: "Banner home", icon: Radio },
       { href: "/admin/team", label: "Team", icon: Users },
       { href: "/admin/partner", label: "Partner", icon: Handshake },
       { href: "/admin/novita", label: "Novità", icon: Megaphone },
       { href: "/admin/forum", label: "Forum", icon: MessagesSquare },
-      { href: "/admin/forum-tags", label: "Tag forum", icon: Tags },
       { href: "/admin/ruoli", label: "Ruoli", icon: BadgeCheck },
     ],
   },
@@ -191,7 +191,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
       <div className="sticky top-0 z-40 flex items-center justify-between border-b border-white/5 bg-[#0a0a12]/90 px-4 py-3 backdrop-blur-xl lg:hidden">
         <div className="flex items-center gap-2">
-          <button type="button" onClick={() => setOpen(true)} className="rounded-lg border border-white/10 p-2 text-zinc-300" aria-label="Menu">
+          <button
+            type="button"
+            onClick={() => setOpen(true)}
+            className="rounded-lg border border-white/10 p-2 text-zinc-300"
+            aria-label="Menu"
+          >
             <Menu className="h-5 w-5" />
           </button>
           <span className="text-sm font-semibold">{pageTitle}</span>
@@ -203,9 +208,18 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
       {open && (
         <div className="fixed inset-0 z-50 lg:hidden">
-          <button type="button" className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setOpen(false)} aria-label="Chiudi" />
+          <button
+            type="button"
+            className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+            onClick={() => setOpen(false)}
+            aria-label="Chiudi"
+          />
           <aside className="absolute left-0 top-0 flex h-full w-[min(18rem,88vw)] flex-col border-r border-white/10 bg-[#0c0c14] shadow-2xl">
-            <button type="button" onClick={() => setOpen(false)} className="absolute right-3 top-4 rounded-lg p-1.5 text-zinc-500 hover:text-white">
+            <button
+              type="button"
+              onClick={() => setOpen(false)}
+              className="absolute right-3 top-4 rounded-lg p-1.5 text-zinc-500 hover:text-white"
+            >
               <X className="h-5 w-5" />
             </button>
             {Sidebar}
@@ -222,7 +236,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <header className="sticky top-0 z-30 hidden border-b border-white/5 bg-[#07070c]/80 px-8 py-4 backdrop-blur-xl lg:block">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-[11px] font-medium uppercase tracking-wider text-zinc-600">Database / CMS</p>
+                <p className="text-[11px] font-medium uppercase tracking-wider text-zinc-600">
+                  Database / CMS
+                </p>
                 <h1 className="text-xl font-semibold tracking-tight text-white">{pageTitle}</h1>
               </div>
               <div className="flex items-center gap-3 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5">

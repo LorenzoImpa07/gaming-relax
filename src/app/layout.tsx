@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Instrument_Serif } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
@@ -6,6 +7,14 @@ import { CookieConsent } from "@/components/CookieConsent";
 import { CartProvider } from "@/context/CartContext";
 import { AuthProvider } from "@/context/AuthContext";
 import { SiteBanner } from "@/components/SiteBanner";
+import { SupportChat } from "@/components/SupportChat";
+
+const instrument = Instrument_Serif({
+  weight: "400",
+  subsets: ["latin"],
+  variable: "--font-instrument",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "Gaming Relax | Sviluppo Software, Bot Discord & Applicazioni",
@@ -36,7 +45,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="it" className="dark">
+    <html lang="it" className={`dark ${instrument.variable}`}>
       <body className="min-h-screen bg-[#0a0a0f] text-zinc-100 antialiased">
         <AuthProvider>
           <CartProvider>
@@ -45,6 +54,7 @@ export default function RootLayout({
             <main className="pt-20">{children}</main>
             <Footer />
             <CookieConsent />
+            <SupportChat />
           </CartProvider>
         </AuthProvider>
       </body>

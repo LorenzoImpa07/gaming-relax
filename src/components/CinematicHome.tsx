@@ -77,18 +77,8 @@ function SceneImage({
   y?: ReturnType<typeof useTransform<number, number>>;
 }) {
   return (
-    <motion.div
-      style={{ scale, x, y }}
-      className="absolute inset-0 will-change-transform"
-    >
-      <Image
-        src={src}
-        alt={alt}
-        fill
-        priority={priority}
-        className="object-cover"
-        sizes="100vw"
-      />
+    <motion.div style={{ scale, x, y }} className="absolute inset-0 will-change-transform">
+      <Image src={src} alt={alt} fill priority={priority} className="object-cover" sizes="100vw" />
       <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/25 to-black/80" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_5%,rgba(0,0,0,0.6)_100%)]" />
       <FilmGrain />
@@ -119,7 +109,6 @@ function SceneQuote({
         <span className="pointer-events-none absolute right-0 top-0 h-8 w-8 border-r border-t border-white/40 sm:h-10 sm:w-10" />
         <span className="pointer-events-none absolute bottom-0 left-0 h-8 w-8 border-b border-l border-white/40 sm:h-10 sm:w-10" />
         <span className="pointer-events-none absolute bottom-0 right-0 h-8 w-8 border-b border-r border-white/40 sm:h-10 sm:w-10" />
-
         <div className="mb-5 mx-auto h-px w-10 bg-white/30" />
         <h2 className="max-w-3xl font-serif text-[1.85rem] font-light leading-[1.12] tracking-tight text-white sm:text-4xl md:text-5xl lg:text-6xl">
           {line1}
@@ -148,7 +137,6 @@ export function CinematicHome() {
     target: containerRef,
     offset: ["start start", "end end"],
   });
-
   const { scrollYProgress: heroP } = useScroll({
     target: heroRef,
     offset: ["start start", "end start"],
@@ -212,34 +200,10 @@ export function CinematicHome() {
   const progressBar = useSpring(pageProgress, { stiffness: 80, damping: 28 });
 
   const products = [
-    {
-      title: "Bot Discord",
-      subtitle: "Economia, moderazione, ticket",
-      icon: Bot,
-      img: IMG.neon,
-      href: "/store",
-    },
-    {
-      title: "Siti & Web App",
-      subtitle: "Design, performance, conversione",
-      icon: Globe,
-      img: IMG.dual,
-      href: "/store",
-    },
-    {
-      title: "Automazioni",
-      subtitle: "Workflow che lavorano per te",
-      icon: Zap,
-      img: IMG.server,
-      href: "/store",
-    },
-    {
-      title: "Software custom",
-      subtitle: "Dal prototipo al prodotto",
-      icon: Cpu,
-      img: IMG.terminal,
-      href: "/store",
-    },
+    { title: "Bot Discord", subtitle: "Economia, moderazione, ticket", icon: Bot, img: IMG.neon, href: "/store" },
+    { title: "Siti & Web App", subtitle: "Design, performance, conversione", icon: Globe, img: IMG.dual, href: "/store" },
+    { title: "Automazioni", subtitle: "Workflow che lavorano per te", icon: Zap, img: IMG.server, href: "/store" },
+    { title: "Software custom", subtitle: "Dal prototipo al prodotto", icon: Cpu, img: IMG.terminal, href: "/store" },
   ];
 
   return (
@@ -267,10 +231,7 @@ export function CinematicHome() {
       </motion.div>
 
       <section ref={heroRef} className="relative h-[100svh] overflow-hidden">
-        <motion.div
-          style={{ scale: heroScale, y: heroY }}
-          className="absolute inset-0 will-change-transform"
-        >
+        <motion.div style={{ scale: heroScale, y: heroY }} className="absolute inset-0 will-change-transform">
           <SceneImage src={IMG.hero} alt="Laptop e codice" priority />
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_25%_15%,rgba(139,92,246,0.3),transparent_55%)]" />
         </motion.div>
@@ -442,7 +403,6 @@ export function CinematicHome() {
               <span className="pointer-events-none absolute right-0 top-0 h-8 w-8 border-r border-t border-white/30" />
               <span className="pointer-events-none absolute bottom-0 left-0 h-8 w-8 border-b border-l border-white/30" />
               <span className="pointer-events-none absolute bottom-0 right-0 h-8 w-8 border-b border-r border-white/30" />
-
               <h2 className="font-serif text-3xl font-light leading-tight tracking-tight text-white sm:text-4xl md:text-5xl">
                 Il tuo nuovo progetto
                 <br />
@@ -450,8 +410,7 @@ export function CinematicHome() {
               </h2>
             </div>
             <p className="mx-auto mt-4 max-w-md text-base font-light text-white/55">
-              Raccontaci cosa ti serve. Ti rispondiamo con un preventivo chiaro,
-              tempi reali e zero giri di parole.
+              Raccontaci cosa ti serve. Ti rispondiamo con un preventivo chiaro, tempi reali e zero giri di parole.
             </p>
             <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
               <Link
@@ -473,7 +432,7 @@ export function CinematicHome() {
         </div>
       </section>
 
-      <div className="bg-[#07070c">
+      <div className="bg-[#07070c]">
         <TeamSection />
       </div>
 

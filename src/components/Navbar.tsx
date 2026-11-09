@@ -13,6 +13,7 @@ import { isAdminEmail } from "@/lib/admin";
 const navLinks = [
   { href: "/", label: "Home" },
   { href: "/store", label: "Store" },
+  { href: "/custom", label: "Custom" },
   { href: "/novita", label: "Novità" },
   { href: "/forum", label: "Forum" },
   { href: "/#team", label: "Team" },
@@ -64,7 +65,7 @@ export function Navbar() {
         </Link>
 
         <nav className="hidden items-center gap-1 rounded-full border border-zinc-800/80 bg-zinc-900/50 px-2 py-1.5 lg:flex">
-          {navLinks.slice(0, 7).map((link) => (
+          {navLinks.slice(0, 8).map((link) => (
             <Link
               key={link.href}
               href={link.href}

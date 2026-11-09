@@ -3,9 +3,9 @@ import "./globals.css";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { CookieConsent } from "@/components/CookieConsent";
-import { SiteBanner } from "@/components/SiteBanner";
 import { CartProvider } from "@/context/CartContext";
 import { AuthProvider } from "@/context/AuthContext";
+import { SiteBanner } from "@/components/SiteBanner";
 
 export const metadata: Metadata = {
   title: "Gaming Relax | Sviluppo Software, Bot Discord & Applicazioni",

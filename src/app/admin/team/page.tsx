@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import { uploadImage } from "@/lib/upload";
+import { uploadImage, isDisplayableImage } from "@/lib/upload";
 import { Upload } from "lucide-react";
 
 type Member = {
@@ -22,6 +22,7 @@ export default function AdminTeamPage() {
   const [editId, setEditId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
+  const [progress, setProgress] = useState(0);
   const [preview, setPreview] = useState<string | null>(null);
   const [error, setError] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);
@@ -47,9 +48,10 @@ export default function AdminTeamPage() {
     if (!file) return;
     setError("");
     setUploading(true);
+    setProgress(0);
     try {
       setPreview(URL.createObjectURL(file));
-      const url = await uploadImage(file, "team");
+      const url = await uploadImage(file, "team", (p) => setProgress(p.percent));
       setForm((f) => ({ ...f, image: url }));
     } catch (err) {
       console.error(err);
@@ -88,7 +90,9 @@ export default function AdminTeamPage() {
   return (
     <div className="grid gap-8 lg:grid-cols-2">
       <form onSubmit={save} className="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-5 space-y-3">
-        <h2 className="font-semibold text-white">{editId ? "Modifica membro" : "Nuovo membro"}</h2>
+        <h2 className="font-semibold text-white">
+          {editId ? "Modifica membro" : "Nuovo membro"}
+        </h2>
 
         <div>
           <label className="block text-xs text-zinc-500 mb-2">Foto profilo</label>
@@ -109,19 +113,58 @@ export default function AdminTeamPage() {
                 onChange={onFile}
                 className="block w-full text-sm text-zinc-400 file:mr-3 file:rounded-lg file:border-0 file:bg-violet-600 file:px-3 file:py-2 file:text-sm file:text-white"
               />
-              <p className="text-xs text-zinc-600 mt-1">{uploading ? "Caricamento..." : "Opzionale — max 5MB"}</p>
+              <p className="text-xs text-zinc-600 mt-1">
+                {uploading
+                  ? `Compressione ${progress}%…`
+                  : "JPG / PNG / WebP — max ~12MB (si comprime in automatico)"}
+              </p>
             </div>
           </div>
         </div>
 
-        <input required placeholder="Nome" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-white" />
-        <input required placeholder="Ruolo" value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })} className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-white" />
-        <textarea required placeholder="Descrizione" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-white" rows={3} />
+        <input
+          required
+          placeholder="Nome"
+          value={form.name}
+          onChange={(e) => setForm({ ...form, name: e.target.value })}
+          className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-white"
+        />
+        <input
+          required
+          placeholder="Ruolo"
+          value={form.role}
+          onChange={(e) => setForm({ ...form, role: e.target.value })}
+          className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-white"
+        />
+        <textarea
+          required
+          placeholder="Descrizione"
+          value={form.description}
+          onChange={(e) => setForm({ ...form, description: e.target.value })}
+          className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-white"
+          rows={3}
+        />
         {error && <p className="text-sm text-red-400">{error}</p>}
         <div className="flex gap-2">
-          <button type="submit" disabled={uploading} className="rounded-full bg-violet-600 px-5 py-2 text-sm text-white disabled:opacity-50">{editId ? "Salva" : "Aggiungi"}</button>
+          <button
+            type="submit"
+            disabled={uploading}
+            className="rounded-full bg-violet-600 px-5 py-2 text-sm text-white disabled:opacity-50"
+          >
+            {editId ? "Salva" : "Aggiungi"}
+          </button>
           {editId && (
-            <button type="button" onClick={() => { setEditId(null); setForm(empty); setPreview(null); }} className="rounded-full border border-zinc-600 px-5 py-2 text-sm text-zinc-300">Annulla</button>
+            <button
+              type="button"
+              onClick={() => {
+                setEditId(null);
+                setForm(empty);
+                setPreview(null);
+              }}
+              className="rounded-full border border-zinc-600 px-5 py-2 text-sm text-zinc-300"
+            >
+              Annulla
+            </button>
           )}
         </div>
       </form>
@@ -129,13 +172,20 @@ export default function AdminTeamPage() {
       <div className="space-y-3">
         {loading && <p className="text-sm text-zinc-500">Caricamento...</p>}
         {items.map((row) => (
-          <div key={row.id} className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-4 flex justify-between gap-2">
+          <div
+            key={row.id}
+            className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-4 flex justify-between gap-2"
+          >
             <div className="flex items-center gap-3">
               <div className="h-12 w-12 rounded-full overflow-hidden bg-zinc-800 shrink-0">
-                {row.image && (row.image.startsWith("http") || row.image.startsWith("/")) ? (
+                {isDisplayableImage(row.image) ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={row.image} alt="" className="h-full w-full object-cover" />
-                ) : null}
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center text-sm font-bold text-violet-400">
+                    {(row.name || "?").charAt(0)}
+                  </div>
+                )}
               </div>
               <div>
                 <p className="font-medium text-white">{row.name}</p>
@@ -146,14 +196,21 @@ export default function AdminTeamPage() {
               <button
                 onClick={() => {
                   setEditId(row.id);
-                  setForm({ name: row.name, role: row.role, description: row.description, image: row.image || "" });
+                  setForm({
+                    name: row.name,
+                    role: row.role,
+                    description: row.description,
+                    image: row.image || "",
+                  });
                   setPreview(row.image || null);
                 }}
                 className="text-xs text-violet-400"
               >
                 Modifica
               </button>
-              <button onClick={() => remove(row.id)} className="text-xs text-red-400">Elimina</button>
+              <button onClick={() => remove(row.id)} className="text-xs text-red-400">
+                Elimina
+              </button>
             </div>
           </div>
         ))}

@@ -32,6 +32,7 @@ type ServiceRow = {
   features: string;
   popular?: boolean;
   available?: boolean;
+  permanent?: boolean;
   discountPercent?: number;
   plans?: PlanRow[];
 };
@@ -53,6 +54,7 @@ const empty = {
   features: "",
   popular: false,
   available: true,
+  permanent: false,
   discountPercent: 0,
   plans: [] as PlanRow[],
 };
@@ -132,6 +134,7 @@ export default function AdminServiziPage() {
       features: form.features,
       popular: !!form.popular,
       available: !!form.available,
+      permanent: !!form.permanent,
       discountPercent: Math.min(100, Math.max(0, Number(form.discountPercent) || 0)),
       plans,
     };
@@ -156,6 +159,7 @@ export default function AdminServiziPage() {
           : (row.features as unknown as string[])?.join("\n") || "",
       popular: !!row.popular,
       available: row.available !== false,
+      permanent: !!row.permanent,
       discountPercent: row.discountPercent || 0,
       plans: parsePlans(row.plans),
     });
@@ -347,6 +351,20 @@ export default function AdminServiziPage() {
           />
           Disponibile (se disattivo = Esaurito)
         </label>
+        <label className="flex items-center gap-2 rounded-xl border border-violet-500/30 bg-violet-500/10 px-3 py-2.5 text-sm text-violet-100">
+          <input
+            type="checkbox"
+            checked={!!form.permanent}
+            onChange={(e) => setForm({ ...form, permanent: e.target.checked })}
+            className="accent-violet-500"
+          />
+          <span>
+            <strong className="text-white">Acquisto permanente</strong>
+            <span className="mt-0.5 block text-xs text-violet-200/70">
+              Se attivo, nello store appare "permanente" al posto di "al mese"
+            </span>
+          </span>
+        </label>
         <div className="flex gap-2">
           <button
             type="submit"
@@ -397,6 +415,7 @@ export default function AdminServiziPage() {
                     {row.category}
                     {row.popular ? " · Più richiesto" : ""}
                     {row.available === false ? " · ESAURITO" : " · disponibile"}
+                    {row.permanent ? " · permanente" : " · al mese"}
                     {planCount > 0 ? ` · ${planCount} piani` : ""}
                   </p>
                 </div>

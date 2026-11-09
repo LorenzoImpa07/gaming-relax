@@ -44,6 +44,7 @@ const navGroups = [
     title: "Catalogo",
     items: [
       { href: "/admin/servizi", label: "Servizi", icon: Package },
+      { href: "/admin/custom", label: "Custom", icon: Package },
       { href: "/admin/sconti", label: "Sconti", icon: Percent },
       { href: "/admin/pagamenti", label: "Pagamenti", icon: CreditCard },
     ],

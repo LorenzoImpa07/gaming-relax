@@ -39,7 +39,7 @@ export function SiteBanner() {
   const loop = `${text}   ·   ${text}   ·   ${text}   ·   `;
 
   return (
-    <div className="fixed left-0 right-0 top-16 z-[45] flex h-9 items-center overflow-hidden border-b border-violet-500/30 bg-gradient-to-r from-violet-950 via-fuchsia-950 to-violet-950 text-xs text-violet-100 sm:top-20">
+    <div className="fixed left-0 right-0 top-16 z-[45] sm:top-20 flex h-9 items-center overflow-hidden border-b border-violet-500/30 bg-gradient-to-r from-violet-950 via-fuchsia-950 to-violet-950 text-xs text-violet-100">
       <div className="flex-1 overflow-hidden whitespace-nowrap">
         <div className="inline-block animate-[marquee_28s_linear_infinite] will-change-transform">
           <span className="px-4 font-medium tracking-wide">{loop}</span>
@@ -56,8 +56,12 @@ export function SiteBanner() {
       </button>
       <style jsx global>{`
         @keyframes marquee {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(-50%); }
+          0% {
+            transform: translateX(0);
+          }
+          100% {
+            transform: translateX(-50%);
+          }
         }
       `}</style>
     </div>

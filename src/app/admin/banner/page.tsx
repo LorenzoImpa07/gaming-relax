@@ -52,11 +52,20 @@ export default function AdminBannerPage() {
   return (
     <div className="mx-auto max-w-xl space-y-6">
       <p className="text-sm text-zinc-400">
-        Banner fisso sotto la navbar con messaggio scorrevole. Puoi attivarlo o disattivarlo in qualsiasi momento.
+        Banner fisso in cima al sito con messaggio scorrevole. Puoi attivarlo o disattivarlo in
+        qualsiasi momento.
       </p>
-      <form onSubmit={save} className="space-y-4 rounded-2xl border border-white/10 bg-[#0c0c14]/80 p-5">
+      <form
+        onSubmit={save}
+        className="space-y-4 rounded-2xl border border-white/10 bg-[#0c0c14]/80 p-5"
+      >
         <label className="flex items-center gap-3 text-sm text-zinc-200">
-          <input type="checkbox" checked={enabled} onChange={(e) => setEnabled(e.target.checked)} className="accent-violet-500" />
+          <input
+            type="checkbox"
+            checked={enabled}
+            onChange={(e) => setEnabled(e.target.checked)}
+            className="accent-violet-500"
+          />
           Banner attivo
         </label>
         <div>
@@ -69,7 +78,11 @@ export default function AdminBannerPage() {
             className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm text-white"
           />
         </div>
-        <button type="submit" disabled={saving} className="rounded-full bg-violet-600 px-5 py-2 text-sm font-medium text-white disabled:opacity-50">
+        <button
+          type="submit"
+          disabled={saving}
+          className="rounded-full bg-violet-600 px-5 py-2 text-sm font-medium text-white disabled:opacity-50"
+        >
           {saving ? "Salvataggio..." : "Salva banner"}
         </button>
         {ok && <p className="text-sm text-emerald-400">Banner aggiornato.</p>}

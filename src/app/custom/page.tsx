@@ -7,6 +7,7 @@ import { ArrowRight, Check, Sparkles } from "lucide-react";
 import { collection, onSnapshot } from "firebase/firestore";
 import { customProducts, type CustomProduct } from "@/data/custom";
 import { db } from "@/lib/firebase";
+import { EmptyState } from "@/components/ui/EmptyState";
 
 function normalize(raw: Record<string, unknown>, id: string): CustomProduct {
   const features = raw.features;
@@ -149,7 +150,7 @@ export default function CustomPage() {
                 <motion.div key={p.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
                   <Link
                     href={`/custom/${p.id}`}
-                    className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-b from-zinc-900/80 to-zinc-950/80 p-6 transition hover:border-violet-500/40 hover:shadow-[0_20px_50px_rgba(139,92,246,0.12)]"
+                    className="card-lift group relative flex h-full flex-col overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-b from-zinc-900/80 to-zinc-950/80 p-6 card-shine"
                   >
                     {p.popular && (
                       <span className="absolute right-4 top-4 rounded-full bg-violet-600 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white">
@@ -185,9 +186,14 @@ export default function CustomPage() {
               );
             })}
             {filtered.length === 0 && (
-              <p className="col-span-full rounded-2xl border border-dashed border-zinc-700 py-16 text-center text-sm text-zinc-500">
-                Nessun prodotto in questa categoria.
-              </p>
+              <div className="col-span-full">
+                <EmptyState
+                  variant="store"
+                  title="Nessun prodotto in questa categoria"
+                  description="Torna presto: stiamo aggiungendo nuovi progetti custom."
+                  codeHint="// site_custom.filter(cat).length === 0"
+                />
+              </div>
             )}
           </div>
         </div>

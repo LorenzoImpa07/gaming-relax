@@ -44,7 +44,7 @@ function normalize(raw: Record<string, unknown>, id: string): CustomProduct {
     popular: !!raw.popular,
     available: raw.available === undefined ? true : !!raw.available,
     discountPercent: Number(raw.discountPercent) || 0,
-    permanent: !!raw.permanent,
+    permanent: true,
     plans,
   };
 }
@@ -100,8 +100,8 @@ export default function CustomPage() {
               <span className="italic text-white/80">fatti da noi.</span>
             </h1>
             <p className="mt-5 text-base leading-relaxed text-zinc-400 sm:text-lg">
-              Siti, web app, bot e automazioni già progettati dal nostro team — con piani
-              chiari, descrizioni complete e possibilità di abbonamento.
+              Acquisto permanente: lo compri ed è tuo. Siti, app, bot e automazioni con piani
+              chiari. Care mensile solo se ti serve manutenzione o evolutive.
             </p>
           </motion.div>
         </div>
@@ -133,9 +133,9 @@ export default function CustomPage() {
               <input type="checkbox" checked={showAvailable} onChange={(e) => setShowAvailable(e.target.checked)} className="accent-violet-500" />
               Solo disponibili
             </label>
-            <Link href="/contatti" className="block rounded-xl border border-dashed border-white/15 px-3 py-3 text-center text-xs text-zinc-400 transition hover:border-violet-500/40 hover:text-violet-200">
+            <Link href="/preventivo" className="block rounded-xl border border-dashed border-white/15 px-3 py-3 text-center text-xs text-zinc-400 transition hover:border-violet-500/40 hover:text-violet-200">
               Serve qualcosa di unico?
-              <span className="mt-1 block font-medium text-violet-300">Preventivo custom →</span>
+              <span className="mt-1 block font-medium text-violet-300">Preventivo guidato →</span>
             </Link>
           </aside>
 
@@ -169,8 +169,11 @@ export default function CustomPage() {
                     </ul>
                     <div className="mt-6 flex items-end justify-between border-t border-white/5 pt-4">
                       <div>
-                        <p className="text-[10px] uppercase tracking-wider text-zinc-500">da</p>
-                        <p className="text-2xl font-semibold text-white">€{fromPrice}</p>
+                        <p className="text-[10px] uppercase tracking-wider text-emerald-500/80">
+                          Acquisto permanente
+                        </p>
+                        <p className="text-2xl font-semibold text-white">da €{fromPrice}</p>
+                        <p className="text-[11px] text-zinc-500">Una tantum · tuo per sempre</p>
                       </div>
                       <span className="inline-flex items-center gap-1 text-sm font-medium text-violet-300 opacity-80 transition group-hover:opacity-100">
                         Dettagli

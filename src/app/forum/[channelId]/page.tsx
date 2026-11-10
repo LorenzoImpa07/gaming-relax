@@ -196,14 +196,6 @@ export default function ChannelPage() {
           {channel.description && (
             <p className="mt-1 text-sm text-zinc-400">{channel.description}</p>
           )}
-          {channel.staffOnly && (
-            <p className="mt-2 text-xs text-amber-400">Solo lo staff può scrivere</p>
-          )}
-          {channel.privateReply && (
-            <p className="mt-2 text-xs text-violet-300">
-              Canale a risposta privata: le discussioni sono visibili solo a te (autore) e allo staff autorizzato.
-            </p>
-          )}
         </div>
         {canPost && (
           <button

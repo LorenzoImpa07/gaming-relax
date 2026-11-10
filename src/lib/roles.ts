@@ -1,13 +1,24 @@
 export type ForumPermissions = {
+  /** Eliminare messaggi di altri */
   deleteMessage: boolean;
+  /** Modificare messaggi di altri */
   editMessage: boolean;
+  /** Eliminare discussioni */
   deleteThread: boolean;
+  /** Modificare titolo discussioni */
   editThread: boolean;
+  /** Eliminare canali (dal sito, non solo dashboard) */
   deleteChannel: boolean;
+  /** Modificare canali */
   editChannel: boolean;
+  /** Creare canali */
   createChannel: boolean;
+  /** Scrivere in canali solo-staff */
   writeStaffChannels: boolean;
+  /** Accedere alla gestione forum in dashboard */
   manageForum: boolean;
+  /** Leggere discussioni a risposta privata (aperte dagli utenti) */
+  readPrivateThreads: boolean;
 };
 
 export const DEFAULT_PERMISSIONS: ForumPermissions = {
@@ -20,18 +31,60 @@ export const DEFAULT_PERMISSIONS: ForumPermissions = {
   createChannel: false,
   writeStaffChannels: false,
   manageForum: false,
+  readPrivateThreads: false,
 };
 
 export const PERMISSION_LABELS: { key: keyof ForumPermissions; label: string; hint: string }[] = [
-  { key: "deleteMessage", label: "Eliminare messaggi", hint: "Può cancellare messaggi di altri utenti nel forum" },
-  { key: "editMessage", label: "Modificare messaggi", hint: "Può modificare messaggi di altri utenti" },
-  { key: "deleteThread", label: "Eliminare discussioni", hint: "Può eliminare intere discussioni" },
-  { key: "editThread", label: "Modificare discussioni", hint: "Può cambiare il titolo di una discussione" },
-  { key: "deleteChannel", label: "Eliminare canali", hint: "Può eliminare canali del forum" },
-  { key: "editChannel", label: "Modificare canali", hint: "Può modificare nome/descrizione/tag dei canali" },
-  { key: "createChannel", label: "Creare canali", hint: "Può creare nuovi canali" },
-  { key: "writeStaffChannels", label: "Scrivere in canali solo-staff", hint: "Può postare nei canali riservati allo staff" },
-  { key: "manageForum", label: "Gestire forum (Dashboard)", hint: "Accesso alle impostazioni forum dalla Dashboard" },
+  {
+    key: "deleteMessage",
+    label: "Eliminare messaggi",
+    hint: "Può cancellare messaggi di altri utenti nel forum",
+  },
+  {
+    key: "editMessage",
+    label: "Modificare messaggi",
+    hint: "Può modificare messaggi di altri utenti",
+  },
+  {
+    key: "deleteThread",
+    label: "Eliminare discussioni",
+    hint: "Può eliminare intere discussioni",
+  },
+  {
+    key: "editThread",
+    label: "Modificare discussioni",
+    hint: "Può cambiare il titolo di una discussione",
+  },
+  {
+    key: "deleteChannel",
+    label: "Eliminare canali",
+    hint: "Può eliminare canali del forum",
+  },
+  {
+    key: "editChannel",
+    label: "Modificare canali",
+    hint: "Può modificare nome/descrizione/tag dei canali",
+  },
+  {
+    key: "createChannel",
+    label: "Creare canali",
+    hint: "Può creare nuovi canali",
+  },
+  {
+    key: "writeStaffChannels",
+    label: "Scrivere in canali solo-staff",
+    hint: "Può postare nei canali riservati allo staff",
+  },
+  {
+    key: "manageForum",
+    label: "Gestire forum (Dashboard)",
+    hint: "Accesso alle impostazioni forum dalla Dashboard",
+  },
+  {
+    key: "readPrivateThreads",
+    label: "Risposte private",
+    hint: "Può leggere le discussioni a risposta privata aperte dagli utenti (solo autore + chi ha questo permesso)",
+  },
 ];
 
 export type SiteRole = {
@@ -71,6 +124,7 @@ export function hasStaffRole(
   return rolesForEmail(allRoles, email).length > 0;
 }
 
+/** True se almeno un ruolo dell'utente ha il permesso, oppure è admin globale */
 export function can(
   allRoles: SiteRole[],
   email: string | null | undefined,

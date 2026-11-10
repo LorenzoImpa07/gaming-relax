@@ -8,6 +8,7 @@ import { collection, onSnapshot } from "firebase/firestore";
 import { services as staticServices, type Service } from "@/data/services";
 import { useCart } from "@/context/CartContext";
 import { db } from "@/lib/firebase";
+import { EmptyState } from "@/components/ui/EmptyState";
 
 function normalize(raw: Record<string, unknown>, id: string): Service {
   const features = raw.features;
@@ -140,7 +141,14 @@ export default function StorePage() {
 
         <div className="relative z-0 grid gap-6 overflow-visible sm:grid-cols-2 sm:gap-8 xl:grid-cols-3">
           {filtered.length === 0 && (
-            <p className="col-span-full text-sm text-zinc-500">Nessun servizio con questi filtri.</p>
+            <div className="col-span-full">
+              <EmptyState
+                variant="store"
+                title="Nessun servizio con questi filtri"
+                description="Prova a cambiare categoria o togli i filtri attivi."
+                codeHint="// filter returned [] — reset e riprova"
+              />
+            </div>
           )}
           {filtered.map((service, i) => (
             <motion.div
@@ -148,7 +156,7 @@ export default function StorePage() {
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.05 }}
-              className={`relative flex flex-col overflow-hidden rounded-2xl border p-6 card-shine box-glow-hover ${
+              className={`card-lift relative flex flex-col overflow-hidden rounded-2xl border p-6 card-shine box-glow-hover ${
                 service.popular ? "border-violet-500/50 bg-violet-500/5 box-glow" : "border-zinc-800 bg-zinc-900/40"
               }`}
             >
@@ -195,13 +203,13 @@ export default function StorePage() {
               </ul>
 
               <div className="mt-auto flex flex-col gap-2">
-                <Link href={`/store/${service.id}`} className="text-center text-sm text-violet-400 hover:underline">
+                <Link href={`/store/${service.id}`} className="link-underline text-center text-sm text-violet-400">
                   Vedi dettagli
                 </Link>
                 <button
                   disabled={service.available === false}
                   onClick={() => addItem(service)}
-                  className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-violet-600 to-cyan-500 px-5 py-3 text-sm font-semibold text-white btn-glow disabled:cursor-not-allowed disabled:opacity-40"
+                  className="btn-press inline-flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-violet-600 to-cyan-500 px-5 py-3 text-sm font-semibold text-white btn-glow disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   <ShoppingCart className="h-4 w-4" />
                   Aggiungi al carrello

@@ -2,7 +2,16 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
+import {
+  doc,
+  getDoc,
+  setDoc,
+  serverTimestamp,
+  collection,
+  query,
+  where,
+  getDocs,
+} from "firebase/firestore";
 import { updateProfile } from "firebase/auth";
 import { db, auth } from "@/lib/firebase";
 import { useAuth } from "@/context/AuthContext";
@@ -17,18 +26,38 @@ type ProfileForm = {
   photoURL: string;
 };
 
+type GiftCardRow = {
+  id: string;
+  code: string;
+  amount: number;
+  balance: number;
+  active: boolean;
+  history?: {
+    type: string;
+    amount: number;
+    balanceBefore: number;
+    balanceAfter: number;
+  }[];
+};
+
 export default function ProfiloPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
   const fileRef = useRef<HTMLInputElement>(null);
   const [form, setForm] = useState<ProfileForm>({
-    nickname: "", nome: "", cognome: "", birthDate: "", bio: "", photoURL: "",
+    nickname: "",
+    nome: "",
+    cognome: "",
+    birthDate: "",
+    bio: "",
+    photoURL: "",
   });
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [giftCards, setGiftCards] = useState<GiftCardRow[]>([]);
 
   useEffect(() => {
     if (loading) return;
@@ -48,6 +77,29 @@ export default function ProfiloPage() {
           bio: (data.bio as string) || "",
           photoURL: (data.photoURL as string) || user.photoURL || "",
         });
+
+        try {
+          const gq = query(
+            collection(db, "gift_cards"),
+            where("assignedEmail", "==", (user.email || "").toLowerCase())
+          );
+          const gsnap = await getDocs(gq);
+          setGiftCards(
+            gsnap.docs.map((d) => {
+              const gd = d.data();
+              return {
+                id: d.id,
+                code: String(gd.code || ""),
+                amount: Number(gd.amount) || 0,
+                balance: Number(gd.balance) || 0,
+                active: gd.active !== false,
+                history: Array.isArray(gd.history) ? gd.history : [],
+              };
+            })
+          );
+        } catch (ge) {
+          console.error("gift cards", ge);
+        }
       } catch (e) {
         console.error(e);
       }
@@ -122,7 +174,7 @@ export default function ProfiloPage() {
 
   return (
     <div className="mx-auto max-w-lg px-4 py-12 sm:py-16">
-      <div className="text-center mb-10">
+      <div className="mb-10 text-center">
         <h1 className="text-3xl font-bold text-white">Il mio profilo</h1>
         <p className="mt-2 text-sm text-zinc-400">
           Nickname, dati personali, foto e bio. Visibili nel forum e nel menu.
@@ -133,26 +185,48 @@ export default function ProfiloPage() {
         <div className="flex justify-center">
           <div className="relative h-24 w-24 overflow-hidden rounded-full border border-zinc-700 bg-zinc-900">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={form.photoURL || "/logo.png"} alt="" className="h-full w-full object-cover" />
+            <img
+              src={form.photoURL || "/logo.png"}
+              alt=""
+              className="h-full w-full object-cover"
+            />
           </div>
         </div>
 
         <div>
           <label className="text-xs uppercase tracking-wider text-zinc-500">Nickname</label>
-          <input required value={form.nickname} onChange={(e) => setForm({ ...form, nickname: e.target.value })} className={field} />
+          <input
+            required
+            value={form.nickname}
+            onChange={(e) => setForm({ ...form, nickname: e.target.value })}
+            className={field}
+          />
         </div>
         <div>
           <label className="text-xs uppercase tracking-wider text-zinc-500">Nome</label>
-          <input value={form.nome} onChange={(e) => setForm({ ...form, nome: e.target.value })} className={field} />
+          <input
+            value={form.nome}
+            onChange={(e) => setForm({ ...form, nome: e.target.value })}
+            className={field}
+          />
         </div>
         <div>
           <label className="text-xs uppercase tracking-wider text-zinc-500">Cognome</label>
-          <input value={form.cognome} onChange={(e) => setForm({ ...form, cognome: e.target.value })} className={field} />
+          <input
+            value={form.cognome}
+            onChange={(e) => setForm({ ...form, cognome: e.target.value })}
+            className={field}
+          />
         </div>
         <div>
           <label className="text-xs uppercase tracking-wider text-zinc-500">Data di nascita</label>
-          <input type="date" value={form.birthDate} onChange={(e) => setForm({ ...form, birthDate: e.target.value })} className={field} />
-          <p className="text-xs text-zinc-600 mt-1">Eta minima richiesta: 14 anni.</p>
+          <input
+            type="date"
+            value={form.birthDate}
+            onChange={(e) => setForm({ ...form, birthDate: e.target.value })}
+            className={field}
+          />
+          <p className="mt-1 text-xs text-zinc-600">Età minima richiesta: 14 anni.</p>
         </div>
         <div>
           <label className="text-xs uppercase tracking-wider text-zinc-500">Foto profilo</label>
@@ -165,19 +239,27 @@ export default function ProfiloPage() {
           />
           {uploading && (
             <div className="mt-2">
-              <p className="text-xs text-zinc-500 mb-1">Caricamento {progress}%</p>
+              <p className="mb-1 text-xs text-zinc-500">Caricamento {progress}%</p>
               <div className="h-1.5 w-full overflow-hidden rounded-full bg-zinc-800">
-                <div className="h-full bg-fuchsia-500 transition-all" style={{ width: `${progress}%` }} />
+                <div
+                  className="h-full bg-fuchsia-500 transition-all"
+                  style={{ width: `${progress}%` }}
+                />
               </div>
             </div>
           )}
         </div>
         <div>
           <label className="text-xs uppercase tracking-wider text-zinc-500">Bio (opzionale)</label>
-          <textarea value={form.bio} onChange={(e) => setForm({ ...form, bio: e.target.value })} rows={3} className={`${field} resize-none`} />
+          <textarea
+            value={form.bio}
+            onChange={(e) => setForm({ ...form, bio: e.target.value })}
+            rows={3}
+            className={`${field} resize-none`}
+          />
         </div>
 
-        {error && <p className="text-sm text-red-400 whitespace-pre-wrap">{error}</p>}
+        {error && <p className="whitespace-pre-wrap text-sm text-red-400">{error}</p>}
         {message && <p className="text-sm text-green-400">{message}</p>}
 
         <button
@@ -188,6 +270,75 @@ export default function ProfiloPage() {
           {saving ? "Salvataggio..." : "Salva profilo"}
         </button>
       </form>
+
+      <div className="mt-12 border-t border-zinc-800 pt-10">
+        <h2 className="text-lg font-semibold text-white">Le tue gift card</h2>
+        <p className="mt-1 text-sm text-zinc-500">
+          Credito assegnato alla tua email. Saldo e storico prima / dopo ogni uso.
+        </p>
+        {giftCards.length === 0 ? (
+          <p className="mt-4 text-sm text-zinc-600">Nessuna gift card su questo account.</p>
+        ) : (
+          <div className="mt-4 space-y-3">
+            {giftCards.map((g) => (
+              <div
+                key={g.id}
+                className="rounded-2xl border border-white/10 bg-zinc-900/50 p-4"
+              >
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <p className="font-mono text-sm font-semibold text-violet-300">{g.code}</p>
+                  <span
+                    className={`rounded-full px-2 py-0.5 text-[10px] ${
+                      g.active && g.balance > 0
+                        ? "bg-emerald-500/15 text-emerald-300"
+                        : "bg-zinc-800 text-zinc-500"
+                    }`}
+                  >
+                    {g.active && g.balance > 0 ? "Attiva" : "Esaurita / off"}
+                  </span>
+                </div>
+                <div className="mt-3 grid grid-cols-2 gap-3 text-sm">
+                  <div>
+                    <p className="text-[10px] uppercase tracking-wider text-zinc-600">
+                      Valore iniziale
+                    </p>
+                    <p className="text-white">€{g.amount.toFixed(2)}</p>
+                  </div>
+                  <div>
+                    <p className="text-[10px] uppercase tracking-wider text-zinc-600">
+                      Saldo attuale
+                    </p>
+                    <p className="font-semibold text-emerald-300">€{g.balance.toFixed(2)}</p>
+                  </div>
+                </div>
+                {g.history && g.history.length > 0 && (
+                  <div className="mt-3 border-t border-white/5 pt-3">
+                    <p className="mb-1.5 text-[10px] uppercase tracking-wider text-zinc-600">
+                      Storico (prima → dopo)
+                    </p>
+                    <ul className="space-y-1 text-xs text-zinc-400">
+                      {[...g.history].reverse().map((h, i) => (
+                        <li key={i}>
+                          <span className="text-zinc-500">{h.type}</span>
+                          {" · "}€{Number(h.amount).toFixed(2)}
+                          {" · "}
+                          <span className="text-zinc-300">
+                            €{Number(h.balanceBefore).toFixed(2)} → €
+                            {Number(h.balanceAfter).toFixed(2)}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                <p className="mt-3 text-[11px] text-zinc-600">
+                  Usa il codice al checkout per applicare il credito.
+                </p>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

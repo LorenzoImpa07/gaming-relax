@@ -16,9 +16,10 @@ const navLinks = [
   { href: "/custom", label: "Custom" },
   { href: "/novita", label: "Novità" },
   { href: "/forum", label: "Forum" },
-  { href: "/#team", label: "Team" },
+  { href: "/preventivo", label: "Preventivo" },
   { href: "/recensioni", label: "Recensioni" },
   { href: "/contatti", label: "Contatti" },
+  { href: "/#team", label: "Team" },
   { href: "/faq", label: "FAQ" },
   { href: "/chi-siamo", label: "Chi siamo" },
 ];

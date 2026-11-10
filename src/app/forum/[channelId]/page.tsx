@@ -62,22 +62,23 @@ export default function ChannelPage() {
   const load = async () => {
     setLoading(true);
     try {
+      let roles: SiteRole[] = [];
       try {
         const rolesSnap = await getDocs(collection(db, "site_roles"));
-        setAllRoles(
-          rolesSnap.docs.map((d) => {
-            const data = d.data();
-            return {
-              id: d.id,
-              name: String(data.name || ""),
-              color: String(data.color || "#a78bfa"),
-              emails: Array.isArray(data.emails) ? data.emails.map(String) : [],
-              order: Number(data.order) || 0,
-              permissions: parsePermissions(data.permissions),
-            } as SiteRole;
-          })
-        );
+        roles = rolesSnap.docs.map((d) => {
+          const data = d.data();
+          return {
+            id: d.id,
+            name: String(data.name || ""),
+            color: String(data.color || "#a78bfa"),
+            emails: Array.isArray(data.emails) ? data.emails.map(String) : [],
+            order: Number(data.order) || 0,
+            permissions: parsePermissions(data.permissions),
+          } as SiteRole;
+        });
+        setAllRoles(roles);
       } catch {}
+
       const chDoc = await getDoc(doc(db, "forum_channels", channelId));
       if (!chDoc.exists()) {
         setChannel(null);
@@ -96,8 +97,16 @@ export default function ChannelPage() {
       const tSnap = await getDocs(
         query(collection(db, "forum_threads"), where("channelId", "==", channelId))
       );
-      const list = tSnap.docs.map((d) => ({ id: d.id, ...d.data() } as ForumThread));
+      let list = tSnap.docs.map((d) => ({ id: d.id, ...d.data() } as ForumThread));
       list.sort((a, b) => toMillis(b.createdAt) - toMillis(a.createdAt));
+
+      if (ch.privateReply) {
+        const uid = user?.uid;
+        const allowStaff =
+          isGlobalAdmin || can(roles, user?.email, "readPrivateThreads", isGlobalAdmin);
+        list = list.filter((t) => allowStaff || (uid && t.authorId === uid));
+      }
+
       setThreads(list);
     } catch (e) {
       console.error(e);
@@ -110,7 +119,7 @@ export default function ChannelPage() {
   useEffect(() => {
     if (channelId) load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [channelId]);
+  }, [channelId, user?.uid]);
 
   const createThread = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -125,6 +134,7 @@ export default function ChannelPage() {
         authorName: user.displayName || user.email || "Utente",
         authorEmail: user.email || "",
         replyCount: 0,
+        privateReply: !!channel?.privateReply,
         createdAt: serverTimestamp(),
         lastActivity: serverTimestamp(),
       });
@@ -188,6 +198,11 @@ export default function ChannelPage() {
           )}
           {channel.staffOnly && (
             <p className="mt-2 text-xs text-amber-400">Solo lo staff può scrivere</p>
+          )}
+          {channel.privateReply && (
+            <p className="mt-2 text-xs text-violet-300">
+              Canale a risposta privata: le discussioni sono visibili solo a te (autore) e allo staff autorizzato.
+            </p>
           )}
         </div>
         {canPost && (

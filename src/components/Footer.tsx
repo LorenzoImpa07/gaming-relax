@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Mail } from "lucide-react";
+import { PaymentMethodsBar } from "@/components/PaymentMethodsBar";
 
 const socials = [
   {
@@ -106,7 +107,11 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mt-10 border-t border-zinc-800 pt-6 text-center text-xs text-zinc-600">
+        <div className="mt-10 border-t border-zinc-800/80 pt-8">
+          <PaymentMethodsBar variant="footer" />
+        </div>
+
+        <div className="mt-8 border-t border-zinc-800 pt-6 text-center text-xs text-zinc-600">
           © {new Date().getFullYear()} Gaming Relax. Tutti i diritti riservati.
         </div>
       </div>

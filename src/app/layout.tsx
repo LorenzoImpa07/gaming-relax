@@ -8,6 +8,7 @@ import { CartProvider } from "@/context/CartContext";
 import { AuthProvider } from "@/context/AuthContext";
 import { SiteBanner } from "@/components/SiteBanner";
 import { SupportChat } from "@/components/SupportChat";
+import { ScrollProgress } from "@/components/ui/ScrollProgress";
 
 const instrument = Instrument_Serif({
   weight: "400",
@@ -49,6 +50,7 @@ export default function RootLayout({
       <body className="min-h-screen bg-[#0a0a0f] text-zinc-100 antialiased">
         <AuthProvider>
           <CartProvider>
+            <ScrollProgress />
             <Navbar />
             <SiteBanner />
             <main className="pt-20">{children}</main>

@@ -37,7 +37,7 @@ type PayMethod = {
 };
 
 const field =
-  "w-full rounded-xl border border-zinc-700 bg-zinc-950/80 px-4 py-3 text-sm text-white placeholder-zinc-500 focus:border-fuchsia-500 focus:outline-none";
+  "w-full rounded-xl border border-zinc-700 bg-zinc-950/80 px-3 py-3 text-sm text-white placeholder-zinc-500 focus:border-fuchsia-500 focus:outline-none sm:px-4";
 
 export default function CheckoutClient() {
   const { items, total, clearCart } = useCart();
@@ -237,15 +237,27 @@ export default function CheckoutClient() {
             )}
 
             {selectedPay?.requiresCard && (
-              <div className="mt-4 space-y-4 rounded-xl border border-fuchsia-500/40 bg-zinc-950/60 p-5">
+              <div className="mt-4 space-y-4 rounded-xl border border-fuchsia-500/40 bg-zinc-950/60 p-4 sm:p-5">
                 <div className="grid gap-5 lg:grid-cols-[1fr_minmax(240px,320px)] lg:items-start">
                   <div className="space-y-3">
-                    <input placeholder="Numero carta" value={card.number} onChange={(e) => setCard({ ...card, number: formatCardNumberInput(e.target.value) })} className={field} inputMode="numeric" autoComplete="cc-number" maxLength={19} />
-                    <div className="grid grid-cols-2 gap-3">
-                      <input placeholder="Scadenza (MM / YY)" value={card.expiry} onChange={(e) => setCard({ ...card, expiry: formatExpiryInput(e.target.value) })} className={field} autoComplete="cc-exp" maxLength={7} />
-                      <input placeholder="Codice di sicurezza" value={card.cvc} onChange={(e) => setCard({ ...card, cvc: e.target.value.replace(/\D/g, "").slice(0, 4) })} onFocus={() => setCvcFocused(true)} onBlur={() => setCvcFocused(false)} className={field} autoComplete="cc-csc" inputMode="numeric" maxLength={4} />
+                    <div>
+                      <label className="mb-1 block text-[11px] text-zinc-500">Numero carta</label>
+                      <input placeholder="ACCT-000003" value={card.number} onChange={(e) => setCard({ ...card, number: formatCardNumberInput(e.target.value) })} className={field} inputMode="numeric" autoComplete="cc-number" maxLength={19} />
                     </div>
-                    <input placeholder="Nome sulla carta" value={card.name} onChange={(e) => setCard({ ...card, name: e.target.value })} className={field} autoComplete="cc-name" />
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="mb-1 block text-[11px] text-zinc-500">Scadenza</label>
+                        <input placeholder="MM / YY" value={card.expiry} onChange={(e) => setCard({ ...card, expiry: formatExpiryInput(e.target.value) })} className={field} autoComplete="cc-exp" maxLength={7} />
+                      </div>
+                      <div>
+                        <label className="mb-1 block text-[11px] text-zinc-500">Codice sicurezza</label>
+                        <input placeholder="CVC" value={card.cvc} onChange={(e) => setCard({ ...card, cvc: e.target.value.replace(/\D/g, "").slice(0, 4) })} onFocus={() => setCvcFocused(true)} onBlur={() => setCvcFocused(false)} className={field} autoComplete="cc-csc" inputMode="numeric" maxLength={4} />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-[11px] text-zinc-500">Titolare</label>
+                      <input placeholder="Nome e cognome" value={card.name} onChange={(e) => setCard({ ...card, name: e.target.value })} className={field} autoComplete="cc-name" />
+                    </div>
                     <p className="text-xs text-zinc-500">I dati carta non vengono salvati in chiaro. La preview è solo visuale.</p>
                   </div>
                   <div className="lg:sticky lg:top-28">
@@ -287,7 +299,7 @@ export default function CheckoutClient() {
               )}
               <div className="flex justify-between text-zinc-400"><span>IVA (22%)</span><span>€{iva.toFixed(2)}</span></div>
               {tipPercent > 0 && (
-                <div className="flex justify-between text-zinc-400"><span>Mancia</span><span>€{tipAmount.toFixed(2)}</span></div>
+                <div className="flex justify-between text-zinc-400"><span>Mancia</span><span>−€{tipAmount.toFixed(2)}</span></div>
               )}
               {giftUse > 0 && (
                 <div className="flex justify-between text-violet-300"><span>Gift card</span><span>−€{giftUse.toFixed(2)}</span></div>

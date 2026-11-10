@@ -71,9 +71,9 @@ export function Footer() {
             <ul className="space-y-2 text-sm text-zinc-400">
               <li><Link href="/" className="transition-colors hover:text-violet-400">Home</Link></li>
               <li><Link href="/store" className="transition-colors hover:text-violet-400">Store</Link></li>
+              <li><Link href="/custom" className="transition-colors hover:text-violet-400">Custom</Link></li>
               <li><Link href="/forum" className="transition-colors hover:text-violet-400">Forum</Link></li>
-              <li><Link href="/#team" className="transition-colors hover:text-violet-400">Team</Link></li>
-              <li><Link href="/recensioni" className="transition-colors hover:text-violet-400">Recensioni</Link></li>
+              <li><Link href="/preventivo" className="transition-colors hover:text-violet-400">Preventivo</Link></li>
               <li><Link href="/contatti" className="transition-colors hover:text-violet-400">Contatti</Link></li>
             </ul>
           </div>
@@ -81,7 +81,7 @@ export function Footer() {
           <div>
             <h4 className="mb-4 text-sm font-semibold uppercase tracking-wider text-zinc-300">Link utili</h4>
             <ul className="space-y-2 text-sm text-zinc-400">
-              <li><Link href="/faq" className="transition-colors hover:text-violet-400">FAQ (Domande Frequenti)</Link></li>
+              <li><Link href="/faq" className="transition-colors hover:text-violet-400">FAQ</Link></li>
               <li><Link href="/termini" className="transition-colors hover:text-violet-400">Termini e Condizioni</Link></li>
               <li><Link href="/privacy" className="transition-colors hover:text-violet-400">Privacy Policy</Link></li>
               <li><Link href="/cookie" className="transition-colors hover:text-violet-400">Cookies</Link></li>
@@ -91,7 +91,7 @@ export function Footer() {
 
           <div>
             <h4 className="mb-4 text-sm font-semibold uppercase tracking-wider text-zinc-300">
-              Orari di supporto & disponibilità
+              Orari di supporto
             </h4>
             <ul className="space-y-2 text-sm text-zinc-400">
               <li>Lun – Ven: 10:00 – 19:00</li>

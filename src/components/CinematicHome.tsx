@@ -119,7 +119,7 @@ export function CinematicHome() {
               href="/store"
               className="btn-press inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-7 py-4 text-sm font-medium text-white"
             >
-              Store bot
+              Store
             </Link>
             <Link
               href="/portfolio"

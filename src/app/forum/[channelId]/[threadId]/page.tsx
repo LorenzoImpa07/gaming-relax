@@ -46,6 +46,7 @@ export default function ThreadPage() {
   const [threadTags, setThreadTags] = useState<ForumThreadTag[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editText, setEditText] = useState("");
+  const [accessDenied, setAccessDenied] = useState(false);
 
   const isGlobalAdmin = isAdminEmail(user?.email);
   const canWriteStaff = can(allRoles, user?.email, "writeStaffChannels", isGlobalAdmin);
@@ -62,10 +63,12 @@ export default function ThreadPage() {
   const load = async () => {
     setLoading(true);
     setError("");
+    setAccessDenied(false);
     try {
+      let roles: SiteRole[] = [];
       try {
         const rolesSnap = await getDocs(collection(db, "site_roles"));
-        setAllRoles(rolesSnap.docs.map((d) => {
+        roles = rolesSnap.docs.map((d) => {
           const data = d.data();
           return {
             id: d.id,
@@ -75,7 +78,8 @@ export default function ThreadPage() {
             order: Number(data.order) || 0,
             permissions: parsePermissions(data.permissions),
           } as SiteRole;
-        }));
+        });
+        setAllRoles(roles);
       } catch {}
       try {
         const tagSnap = await getDocs(collection(db, "forum_thread_tags"));
@@ -88,10 +92,31 @@ export default function ThreadPage() {
         getDoc(doc(db, "forum_channels", channelId)),
         getDoc(doc(db, "forum_threads", threadId)),
       ]);
-      if (chDoc.exists()) setChannel({ id: chDoc.id, ...chDoc.data() } as ForumChannel);
-      else setChannel(null);
-      if (thDoc.exists()) setThread({ id: thDoc.id, ...thDoc.data() } as ForumThread);
-      else { setThread(null); setPosts([]); setLoading(false); return; }
+      const ch = chDoc.exists() ? ({ id: chDoc.id, ...chDoc.data() } as ForumChannel) : null;
+      setChannel(ch);
+
+      if (!thDoc.exists()) {
+        setThread(null);
+        setPosts([]);
+        setLoading(false);
+        return;
+      }
+
+      const thr = { id: thDoc.id, ...thDoc.data() } as ForumThread;
+      const isPrivate = !!ch?.privateReply || !!thr.privateReply;
+      if (isPrivate) {
+        const isAuthor = !!user?.uid && thr.authorId === user.uid;
+        const staffOk =
+          isGlobalAdmin || can(roles, user?.email, "readPrivateThreads", isGlobalAdmin);
+        if (!isAuthor && !staffOk) {
+          setAccessDenied(true);
+          setThread(null);
+          setPosts([]);
+          setLoading(false);
+          return;
+        }
+      }
+      setThread(thr);
 
       try {
         const pSnap = await getDocs(query(collection(db, "forum_posts"), where("threadId", "==", threadId)));
@@ -110,7 +135,7 @@ export default function ThreadPage() {
   useEffect(() => {
     if (channelId && threadId) load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [channelId, threadId]);
+  }, [channelId, threadId, user?.uid]);
 
   const sendReply = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -174,6 +199,26 @@ export default function ThreadPage() {
   };
 
   if (loading) return <div className="mx-auto max-w-3xl px-4 py-16 text-sm text-zinc-500">Caricamento...</div>;
+
+  if (accessDenied) {
+    return (
+      <div className="mx-auto max-w-lg px-4 py-24 text-center">
+        <h1 className="text-xl font-semibold text-white">Discussione privata</h1>
+        <p className="mt-3 text-sm text-zinc-400">
+          Questa discussione ha risposta privata. Solo l'autore e lo staff con permesso
+          dedicato possono leggerla.
+        </p>
+        <Link
+          href={`/forum/${encodeURIComponent(channelId)}`}
+          className="mt-6 inline-flex items-center gap-2 text-sm text-violet-300 hover:underline"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Torna al canale
+        </Link>
+      </div>
+    );
+  }
+
   if (!thread) return (
     <div className="mx-auto max-w-3xl px-4 py-16 text-center text-zinc-400">
       Discussione non trovata.{" "}
@@ -199,6 +244,10 @@ export default function ThreadPage() {
         <span>{thread.title}</span>
       </h1>
 
+      {(channel?.privateReply || thread.privateReply) && (
+        <p className="mb-4 text-xs text-violet-300">Discussione a risposta privata</p>
+      )}
+
       {canSetTag && (
         <div className="mb-4 flex flex-wrap items-center gap-2">
           <span className="text-xs text-zinc-500">Tag staff:</span>
@@ -217,9 +266,6 @@ export default function ThreadPage() {
               {tg.name}
             </button>
           ))}
-          {threadTags.length === 0 && (
-            <Link href="/admin/forum-tags" className="text-xs text-violet-400 hover:underline">Crea tag in Dashboard</Link>
-          )}
         </div>
       )}
 

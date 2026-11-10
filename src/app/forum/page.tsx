@@ -56,7 +56,7 @@ export default function ForumPage() {
             {loading && <p className="text-sm text-zinc-500">Caricamento forum...</p>}
             {!loading && categories.length === 0 && (
               <div className="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-8 text-center text-zinc-400">
-                Nessuna categoria ancora. L'admin puo crearle da Dashboard - Forum.
+                Nessuna categoria ancora. L'admin può crearle da Dashboard → Forum.
               </div>
             )}
             {categories.map((cat) => {
@@ -70,7 +70,7 @@ export default function ForumPage() {
                 >
                   <div className="flex items-center gap-2 border-b border-zinc-800 bg-zinc-900/60 px-5 py-3">
                     <span
-                      className="h-2.5 w-2.5 rounded-full shrink-0"
+                      className="h-2.5 w-2.5 shrink-0 rounded-full"
                       style={{ backgroundColor: cat.color || "#34d399" }}
                     />
                     <h2 className="font-semibold text-white">{cat.name}</h2>
@@ -109,7 +109,7 @@ export default function ForumPage() {
 
           <aside className="space-y-4">
             <div className="rounded-2xl border border-zinc-800 bg-zinc-950/80 p-5">
-              <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500 mb-2">Sei connesso</p>
+              <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-zinc-500">Sei connesso</p>
               {user ? (
                 <>
                   <p className="font-semibold text-white">{user.displayName || user.email}</p>
@@ -127,7 +127,7 @@ export default function ForumPage() {
               )}
             </div>
             <div className="rounded-2xl border border-zinc-800 bg-zinc-950/80 p-5">
-              <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500 mb-3">Statistiche forum</p>
+              <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-zinc-500">Statistiche forum</p>
               <dl className="space-y-2 text-sm">
                 <div className="flex justify-between">
                   <dt className="text-zinc-500">Categorie</dt>
@@ -149,20 +149,27 @@ export default function ForumPage() {
 function ChannelInfo({ channel }: { channel: ForumChannel }) {
   return (
     <>
-      <div className="flex items-start gap-3 min-w-0">
-        <span className="text-xl leading-none mt-0.5">{channel.icon || "#"}</span>
+      <div className="flex min-w-0 items-start gap-3">
+        <span className="mt-0.5 text-xl leading-none">{channel.icon || "💬"}</span>
         <div className="min-w-0">
-          <p className="font-medium text-white flex items-center gap-2">
+          <p className="flex items-center gap-2 font-medium text-white">
             {channel.name}
-            {channel.type === "link" && <span className="text-xs text-zinc-500">ext</span>}
-            {channel.staffOnly && (
-              <span className="rounded bg-amber-500/20 px-1.5 py-0.5 text-[10px] text-amber-300">
-                Solo staff
-              </span>
-            )}
+            {channel.type === "link" && <span className="text-xs text-zinc-500">↗</span>}
           </p>
           {channel.description && (
-            <p className="mt-0.5 text-sm text-zinc-500 line-clamp-2">{channel.description}</p>
+            <p className="mt-0.5 line-clamp-2 text-sm text-zinc-500">{channel.description}</p>
+          )}
+          {Array.isArray(channel.tags) && channel.tags.length > 0 && (
+            <div className="mt-1.5 flex flex-wrap gap-1">
+              {channel.tags.map((tag) => (
+                <span
+                  key={tag}
+                  className="rounded border border-violet-500/40 bg-violet-500/10 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-violet-300"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
           )}
         </div>
       </div>

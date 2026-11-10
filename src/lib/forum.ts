@@ -58,7 +58,9 @@ export type ForumPost = {
   authorId: string;
   authorName: string;
   authorEmail?: string;
+  authorPhotoURL?: string | null;
   createdAt?: unknown;
+  editedAt?: unknown;
 };
 
 export const CATEGORY_COLOR_PRESETS = [

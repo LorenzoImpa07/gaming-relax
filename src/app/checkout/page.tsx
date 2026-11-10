@@ -11,6 +11,9 @@ import {
   query,
   where,
   serverTimestamp,
+  doc,
+  updateDoc,
+  arrayUnion,
 } from "firebase/firestore";
 import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
@@ -42,6 +45,14 @@ export default function CheckoutPage() {
   const [discountPercent, setDiscountPercent] = useState(0);
   const [discountApplied, setDiscountApplied] = useState("");
   const [discountError, setDiscountError] = useState("");
+  const [giftCode, setGiftCode] = useState("");
+  const [giftApplied, setGiftApplied] = useState<{
+    id: string;
+    code: string;
+    balance: number;
+  } | null>(null);
+  const [giftError, setGiftError] = useState("");
+  const [giftAmount, setGiftAmount] = useState(0);
   const [form, setForm] = useState({
     nome: "",
     cognome: "",
@@ -89,7 +100,9 @@ export default function CheckoutPage() {
     [afterDiscount, tipPercent]
   );
   const iva = useMemo(() => afterDiscount * 0.22, [afterDiscount]);
-  const grandTotal = afterDiscount + tipAmount + iva;
+  const beforeGift = afterDiscount + tipAmount + iva;
+  const giftUse = Math.min(giftAmount, beforeGift);
+  const grandTotal = Math.max(0, beforeGift - giftUse);
 
   const applyDiscount = async () => {
     setDiscountError("");
@@ -121,6 +134,56 @@ export default function CheckoutPage() {
     }
   };
 
+  const applyGift = async () => {
+    setGiftError("");
+    const code = giftCode.trim().toUpperCase();
+    if (!code) {
+      setGiftError("Inserisci il codice gift card");
+      return;
+    }
+    const email = (form.email || user?.email || "").trim().toLowerCase();
+    if (!email) {
+      setGiftError("Inserisci l'email di fatturazione prima");
+      return;
+    }
+    try {
+      const q = query(
+        collection(db, "gift_cards"),
+        where("code", "==", code),
+        where("active", "==", true)
+      );
+      const snap = await getDocs(q);
+      if (snap.empty) {
+        setGiftApplied(null);
+        setGiftAmount(0);
+        setGiftError("Gift card non valida o disattivata");
+        return;
+      }
+      const d = snap.docs[0];
+      const data = d.data();
+      const assigned = String(data.assignedEmail || "").toLowerCase();
+      if (assigned && assigned !== email) {
+        setGiftApplied(null);
+        setGiftAmount(0);
+        setGiftError("Questa gift card è assegnata a un'altra email");
+        return;
+      }
+      const balance = Number(data.balance) || 0;
+      if (balance <= 0) {
+        setGiftApplied(null);
+        setGiftAmount(0);
+        setGiftError("Saldo esaurito");
+        return;
+      }
+      setGiftApplied({ id: d.id, code, balance });
+      setGiftAmount(balance);
+      setGiftError("");
+    } catch (e) {
+      console.error(e);
+      setGiftError("Errore verifica gift card");
+    }
+  };
+
   if (items.length === 0 && !done) {
     return (
       <div className="mx-auto max-w-2xl px-4 py-24 text-center">
@@ -148,7 +211,7 @@ export default function CheckoutPage() {
     }
     setLoading(true);
     try {
-      await addDoc(collection(db, "orders"), {
+      const orderRef = await addDoc(collection(db, "orders"), {
         userId: user?.uid || null,
         customer: { ...form },
         items: items.map((i) => ({
@@ -166,6 +229,8 @@ export default function CheckoutPage() {
         tipPercent,
         tipAmount,
         iva,
+        giftCardCode: giftApplied?.code || null,
+        giftCardAmount: giftUse,
         total: grandTotal,
         paymentMethod: selectedPay.name,
         paymentMethodId: selectedPay.id,
@@ -176,6 +241,24 @@ export default function CheckoutPage() {
         status: "pending",
         createdAt: serverTimestamp(),
       });
+
+      if (giftApplied && giftUse > 0) {
+        const gref = doc(db, "gift_cards", giftApplied.id);
+        const before = giftApplied.balance;
+        const after = Math.max(0, before - giftUse);
+        await updateDoc(gref, {
+          balance: after,
+          history: arrayUnion({
+            type: "used",
+            amount: giftUse,
+            balanceBefore: before,
+            balanceAfter: after,
+            orderId: orderRef.id,
+            at: new Date().toISOString(),
+          }),
+        });
+      }
+
       clearCart();
       setDone(true);
     } catch (err) {
@@ -285,7 +368,6 @@ export default function CheckoutPage() {
                     <div className="min-w-0 flex-1">
                       <div className="font-medium text-white">{m.name}</div>
                       {m.description && <div className="text-xs text-zinc-400">{m.description}</div>}
-                      {m.link && <div className="mt-0.5 truncate text-[11px] text-violet-400/80">{m.link}</div>}
                     </div>
                   </label>
                 ))}
@@ -299,14 +381,7 @@ export default function CheckoutPage() {
                   <input placeholder="Codice di sicurezza" value={card.cvc} onChange={(e) => setCard({ ...card, cvc: e.target.value })} className={field} autoComplete="cc-csc" />
                 </div>
                 <input placeholder="Nome sulla carta" value={card.name} onChange={(e) => setCard({ ...card, name: e.target.value })} className={field} autoComplete="cc-name" />
-                <p className="text-xs text-zinc-500">I dati carta non vengono salvati in chiaro.</p>
               </div>
-            )}
-            {selectedPay?.link && !selectedPay.requiresCard && (
-              <p className="mt-3 text-xs text-zinc-400">
-                Dopo l&apos;ordine potrai completare il pagamento dal link di{" "}
-                <span className="text-violet-300">{selectedPay.name}</span>.
-              </p>
             )}
           </div>
         </div>
@@ -323,16 +398,27 @@ export default function CheckoutPage() {
               ))}
             </ul>
             <div className="mb-4 flex gap-2">
-              <input placeholder="Codice sconto o codice creator" value={discountCode} onChange={(e) => setDiscountCode(e.target.value)} className="flex-1 rounded-full border border-zinc-700 bg-zinc-950 px-4 py-2 text-sm text-white placeholder-zinc-500 focus:border-fuchsia-500 focus:outline-none" />
+              <input placeholder="Codice sconto" value={discountCode} onChange={(e) => setDiscountCode(e.target.value)} className="flex-1 rounded-full border border-zinc-700 bg-zinc-950 px-4 py-2 text-sm text-white placeholder-zinc-500 focus:border-fuchsia-500 focus:outline-none" />
               <button type="button" onClick={applyDiscount} className="rounded-full border border-zinc-600 px-4 py-2 text-sm text-zinc-200 hover:border-fuchsia-500">Applica</button>
             </div>
             {discountError && <p className="mb-2 text-xs text-red-400">{discountError}</p>}
             {discountApplied && <p className="mb-2 text-xs text-green-400">Codice {discountApplied} applicato (−{discountPercent}%)</p>}
+            <div className="mb-4 flex gap-2">
+              <input placeholder="Codice gift card" value={giftCode} onChange={(e) => setGiftCode(e.target.value)} className="flex-1 rounded-full border border-zinc-700 bg-zinc-950 px-4 py-2 text-sm text-white placeholder-zinc-500 focus:border-violet-500 focus:outline-none" />
+              <button type="button" onClick={applyGift} className="rounded-full border border-zinc-600 px-4 py-2 text-sm text-zinc-200 hover:border-violet-500">Gift</button>
+            </div>
+            {giftError && <p className="mb-2 text-xs text-red-400">{giftError}</p>}
+            {giftApplied && (
+              <p className="mb-2 text-xs text-violet-300">
+                Gift {giftApplied.code}: saldo €{giftApplied.balance.toFixed(2)}
+              </p>
+            )}
             <div className="space-y-2 border-t border-zinc-800 pt-4 text-sm">
               <div className="flex justify-between text-zinc-400"><span>Subtotale</span><span>€{subtotal.toFixed(2)}</span></div>
               {discountPercent > 0 && <div className="flex justify-between text-green-400"><span>Sconto ({discountPercent}%)</span><span>−€{discountAmount.toFixed(2)}</span></div>}
               <div className="flex justify-between text-zinc-400"><span>IVA stimata (22%)</span><span>€{iva.toFixed(2)}</span></div>
               {tipPercent > 0 && <div className="flex justify-between text-zinc-400"><span>Mancia ({tipPercent}%)</span><span>€{tipAmount.toFixed(2)}</span></div>}
+              {giftUse > 0 && <div className="flex justify-between text-violet-300"><span>Gift card</span><span>−€{giftUse.toFixed(2)}</span></div>}
               <div className="flex justify-between border-t border-zinc-800 pt-2">
                 <span className="font-medium text-zinc-200">Totale</span>
                 <span className="text-xl font-bold text-fuchsia-400">€{grandTotal.toFixed(2)}</span>
@@ -343,10 +429,6 @@ export default function CheckoutPage() {
             </button>
             <p className="mt-4 text-center text-xs text-zinc-500">
               <Link href="/carrello" className="hover:text-fuchsia-400">← Torna al carrello</Link>
-              {" · "}
-              <Link href="/privacy" className="hover:text-fuchsia-400">Privacy</Link>
-              {" · "}
-              <Link href="/termini" className="hover:text-fuchsia-400">Termini</Link>
             </p>
           </div>
         </div>

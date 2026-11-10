@@ -27,7 +27,7 @@ function normalize(raw: Record<string, unknown>, id: string): Service {
     popular: !!raw.popular,
     available: raw.available === undefined ? true : !!raw.available,
     discountPercent: Number(raw.discountPercent) || 0,
-    permanent: !!raw.permanent,
+    permanent: false,
   };
 }
 
@@ -84,9 +84,13 @@ export default function StorePage() {
   return (
     <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-24">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-12 text-center">
+        <p className="mb-2 font-mono text-[11px] uppercase tracking-[0.2em] text-violet-400">
+          Abbonamenti mensili
+        </p>
         <h1 className="text-3xl font-bold text-white sm:text-4xl text-glow">Store Servizi</h1>
         <p className="mx-auto mt-4 max-w-2xl text-zinc-400">
-          Scegli il pacchetto più adatto. Prezzi trasparenti e supporto incluso.
+          Servizi in abbonamento mensile: bot, web, automazioni e supporto. Prezzo chiaro al mese,
+          rinnovo secondo i termini del servizio.
         </p>
       </motion.div>
 
@@ -125,7 +129,7 @@ export default function StorePage() {
           </div>
 
           <div>
-            <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-fuchsia-400">Prezzo</p>
+            <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-fuchsia-400">Prezzo / mese</p>
             <div className="mb-2 flex justify-between text-sm text-zinc-400">
               <span>€0</span>
               <span>€{maxPrice}</span>
@@ -178,7 +182,7 @@ export default function StorePage() {
                 ) : (
                   <span className="text-3xl font-bold text-white">€{service.price}</span>
                 )}
-                <span className="ml-1 text-sm text-zinc-500">{service.permanent ? "permanente" : "al mese"}</span>
+                <span className="ml-1 text-sm text-zinc-500">/ mese</span>
               </div>
 
               <ul className="mb-6 flex-1 space-y-2">

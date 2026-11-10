@@ -282,10 +282,16 @@ export default function CheckoutClient() {
             {giftApplied && <p className="mb-2 text-xs text-violet-300">Gift {giftApplied.code}: €{giftApplied.balance.toFixed(2)}</p>}
             <div className="space-y-2 border-t border-zinc-800 pt-4 text-sm">
               <div className="flex justify-between text-zinc-400"><span>Subtotale</span><span>€{subtotal.toFixed(2)}</span></div>
-              {discountPercent > 0 && <div className="flex justify-between text-green-400"><span>Sconto</span><span>−€{discountAmount.toFixed(2)}</span></div>}
-              <div className="flex justify-between text-zinc-400"><span>IVA (22%)</span><span>€{iva.toFixed(2)}</span></div>}
-              {tipPercent > 0 && <div className="flex justify-between text-zinc-400"><span>Mancia</span><span>€{tipAmount.toFixed(2)}</span></div>}
-              {giftUse > 0 && <div className="flex justify-between text-violet-300"><span>Gift card</span><span>−€{giftUse.toFixed(2)}</span></div>}
+              {discountPercent > 0 && (
+                <div className="flex justify-between text-green-400"><span>Sconto</span><span>−€{discountAmount.toFixed(2)}</span></div>
+              )}
+              <div className="flex justify-between text-zinc-400"><span>IVA (22%)</span><span>€{iva.toFixed(2)}</span></div>
+              {tipPercent > 0 && (
+                <div className="flex justify-between text-zinc-400"><span>Mancia</span><span>€{tipAmount.toFixed(2)}</span></div>
+              )}
+              {giftUse > 0 && (
+                <div className="flex justify-between text-violet-300"><span>Gift card</span><span>−€{giftUse.toFixed(2)}</span></div>
+              )}
               <div className="flex justify-between border-t border-zinc-800 pt-2">
                 <span className="font-medium text-zinc-200">Totale</span>
                 <span className="text-xl font-bold text-white">€{grandTotal.toFixed(2)}</span>

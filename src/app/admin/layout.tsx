@@ -9,6 +9,7 @@ import {
   ShoppingBag,
   Star,
   MessageSquare,
+  FileText,
   Package,
   Users,
   Handshake,
@@ -39,6 +40,7 @@ const navGroups = [
       { href: "/admin/ordini", label: "Ordini", icon: ShoppingBag },
       { href: "/admin/recensioni", label: "Recensioni", icon: Star },
       { href: "/admin/messaggi", label: "Messaggi", icon: MessageSquare },
+      { href: "/admin/preventivi", label: "Preventivi", icon: FileText },
     ],
   },
   {
@@ -152,7 +154,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <div className="absolute -right-40 bottom-20 h-[380px] w-[380px] rounded-full bg-fuchsia-600/10 blur-[110px]" />
       </div>
 
-      {/* FIXED TOP BAR */}
       <header className="fixed left-0 right-0 top-0 z-50 border-b border-white/10 bg-[#0a0a12]/90 backdrop-blur-2xl">
         <div className="mx-auto flex h-14 max-w-[1600px] items-center gap-3 px-3 sm:h-16 sm:gap-4 sm:px-5">
           <button

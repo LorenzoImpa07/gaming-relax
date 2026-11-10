@@ -7,6 +7,8 @@ import { collection, getDocs, orderBy, query } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useAuth } from "@/context/AuthContext";
 import type { ForumCategory, ForumChannel } from "@/lib/forum";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { ForumRowSkeleton } from "@/components/ui/Skeleton";
 
 export default function ForumPage() {
   const { user } = useAuth();
@@ -43,7 +45,7 @@ export default function ForumPage() {
           </div>
           {!user && (
             <p className="text-sm text-zinc-500">
-              <Link href="/login?next=/forum" className="text-violet-400 hover:underline">
+              <Link href="/login?next=/forum" className="link-underline text-violet-400">
                 Accedi
               </Link>{" "}
               per aprire discussioni e rispondere.
@@ -53,11 +55,20 @@ export default function ForumPage() {
 
         <div className="grid gap-8 lg:grid-cols-[1fr_280px]">
           <div className="space-y-6">
-            {loading && <p className="text-sm text-zinc-500">Caricamento forum...</p>}
-            {!loading && categories.length === 0 && (
-              <div className="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-8 text-center text-zinc-400">
-                Nessuna categoria ancora. L'admin può crearle da Dashboard → Forum.
+            {loading && (
+              <div className="overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950/80">
+                {[0, 1, 2, 3].map((i) => (
+                  <ForumRowSkeleton key={i} />
+                ))}
               </div>
+            )}
+            {!loading && categories.length === 0 && (
+              <EmptyState
+                variant="forum"
+                title="Forum in costruzione"
+                description="Nessuna categoria ancora. L'admin può crearle da Dashboard → Forum."
+                codeHint="// forum_categories is empty"
+              />
             )}
             {categories.map((cat) => {
               const catChannels = channels.filter((c) => c.categoryId === cat.id);
@@ -120,7 +131,7 @@ export default function ForumPage() {
               ) : (
                 <>
                   <p className="text-sm text-zinc-400">Non sei loggato.</p>
-                  <Link href="/login?next=/forum" className="mt-3 inline-block text-sm text-violet-400 hover:underline">
+                  <Link href="/login?next=/forum" className="link-underline mt-3 inline-block text-sm text-violet-400">
                     Accedi ora
                   </Link>
                 </>

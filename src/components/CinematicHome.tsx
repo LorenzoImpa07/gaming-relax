@@ -7,7 +7,6 @@ import {
   motion,
   useScroll,
   useTransform,
-  useSpring,
   AnimatePresence,
 } from "framer-motion";
 import {
@@ -22,6 +21,7 @@ import { TeamSection } from "@/components/TeamSection";
 import { Partners } from "@/components/Partners";
 import { TrustBar } from "@/components/TrustBar";
 import { PortfolioTeaser } from "@/components/PortfolioTeaser";
+import { HeroSpotlight } from "@/components/ui/HeroSpotlight";
 
 const IMG = {
   hero: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=1920&q=90",
@@ -74,25 +74,19 @@ function WordCycle() {
 export function CinematicHome() {
   const root = useRef<HTMLDivElement>(null);
   const hero = useRef<HTMLDivElement>(null);
-  const { scrollYProgress: page } = useScroll({ target: root, offset: ["start start", "end end"] });
   const { scrollYProgress: heroP } = useScroll({ target: hero, offset: ["start start", "end start"] });
-  const bar = useSpring(page, { stiffness: 100, damping: 30 });
   const heroOp = useTransform(heroP, [0, 0.5], [1, 0]);
   const heroY = useTransform(heroP, [0, 1], [0, 80]);
 
   return (
     <div ref={root} className="relative bg-[#08051a] text-white">
-      <motion.div
-        className="fixed left-0 top-0 z-[90] h-[3px] origin-left bg-gradient-to-r from-violet-400 via-fuchsia-400 to-cyan-300"
-        style={{ scaleX: bar }}
-      />
-
       <section ref={hero} className="relative min-h-[100svh] overflow-hidden">
         <div className="absolute inset-0">
           <Image src={IMG.hero} alt="" fill priority className="object-cover" sizes="100vw" />
           <div className="absolute inset-0 bg-[#0a0618]/60" />
           <div className="absolute inset-0 bg-gradient-to-b from-[#12082a]/40 via-transparent to-[#08051a]" />
         </div>
+        <HeroSpotlight />
 
         <motion.div
           style={{ opacity: heroOp, y: heroY }}
@@ -116,20 +110,20 @@ export function CinematicHome() {
           <div className="mt-10 flex flex-wrap gap-3">
             <Link
               href="/custom"
-              className="inline-flex items-center gap-2 rounded-full bg-white px-8 py-4 text-sm font-semibold text-zinc-900"
+              className="btn-press inline-flex items-center gap-2 rounded-full bg-white px-8 py-4 text-sm font-semibold text-zinc-900"
             >
               Esplora Custom
               <ArrowRight className="h-4 w-4" />
             </Link>
             <Link
               href="/store"
-              className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-7 py-4 text-sm font-medium text-white"
+              className="btn-press inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-7 py-4 text-sm font-medium text-white"
             >
               Store bot
             </Link>
             <Link
               href="/portfolio"
-              className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-7 py-4 text-sm font-medium text-white"
+              className="btn-press inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-7 py-4 text-sm font-medium text-white"
             >
               Portfolio
             </Link>
@@ -192,7 +186,7 @@ export function CinematicHome() {
               <Link
                 key={c.title}
                 href={c.href}
-                className="group rounded-3xl border border-white/12 bg-white/[0.05] p-7 transition hover:border-violet-500/40"
+                className="card-lift group rounded-3xl border border-white/12 bg-white/[0.05] p-7"
               >
                 <c.icon className="mb-4 h-6 w-6 text-violet-300" />
                 <h3 className="text-xl font-semibold text-white">{c.title}</h3>
@@ -220,13 +214,13 @@ export function CinematicHome() {
           <div className="mt-10 flex flex-wrap justify-center gap-4">
             <Link
               href="/preventivo"
-              className="rounded-full bg-white px-9 py-4 text-sm font-semibold text-zinc-900"
+              className="btn-press rounded-full bg-white px-9 py-4 text-sm font-semibold text-zinc-900"
             >
               Preventivo guidato
             </Link>
             <Link
               href="/custom"
-              className="rounded-full border border-white/30 bg-white/10 px-9 py-4 text-sm text-white"
+              className="btn-press rounded-full border border-white/30 bg-white/10 px-9 py-4 text-sm text-white"
             >
               Catalogo Custom
             </Link>

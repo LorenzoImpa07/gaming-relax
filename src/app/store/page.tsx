@@ -3,12 +3,13 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { PageHero } from "@/components/ui/PageHero";
 import { Check, ShoppingCart } from "lucide-react";
 import { collection, onSnapshot } from "firebase/firestore";
 import { services as staticServices, type Service } from "@/data/services";
 import { useCart } from "@/context/CartContext";
 import { db } from "@/lib/firebase";
-import { EmptyState } from "@/components/ui/EmptyState";
 
 function normalize(raw: Record<string, unknown>, id: string): Service {
   const features = raw.features;
@@ -32,22 +33,13 @@ function normalize(raw: Record<string, unknown>, id: string): Service {
   };
 }
 
-const CATEGORIES = [
-  { id: "all", label: "Tutti" },
-  { id: "bot", label: "Discord" },
-  { id: "web", label: "Web" },
-  { id: "software", label: "Software" },
-  { id: "automation", label: "Automazioni" },
-  { id: "support", label: "Supporto" },
-];
-
 export default function StorePage() {
   const { addItem } = useCart();
   const [list, setList] = useState<Service[]>(staticServices);
   const [showAvailable, setShowAvailable] = useState(true);
   const [showSoldOut, setShowSoldOut] = useState(true);
   const [maxPrice, setMaxPrice] = useState(1000);
-  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
 
   useEffect(() => {
     const unsub = onSnapshot(
@@ -66,7 +58,10 @@ export default function StorePage() {
     return () => unsub();
   }, []);
 
-  const priceCeiling = useMemo(() => Math.max(...list.map((s) => s.price), 100), [list]);
+  const priceCeiling = useMemo(
+    () => Math.max(...list.map((s) => s.price), 100),
+    [list]
+  );
 
   const filtered = useMemo(() => {
     return list.filter((s) => {
@@ -82,23 +77,34 @@ export default function StorePage() {
   const countAvailable = list.filter((s) => s.available !== false).length;
   const countSoldOut = list.filter((s) => s.available === false).length;
 
-  return (
-    <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-24">
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-12 text-center">
-        <p className="mb-2 font-mono text-[11px] uppercase tracking-[0.2em] text-violet-400">
-          Abbonamenti mensili
-        </p>
-        <h1 className="text-3xl font-bold text-white sm:text-4xl text-glow">Store Servizi</h1>
-        <p className="mx-auto mt-4 max-w-2xl text-zinc-400">
-          Servizi in abbonamento mensile: bot, web, automazioni e supporto. Prezzo chiaro al mese,
-          rinnovo secondo i termini del servizio.
-        </p>
-      </motion.div>
+  const categories = [
+    { id: "all", label: "Tutti" },
+    { id: "bot", label: "Discord" },
+    { id: "web", label: "Web" },
+    { id: "software", label: "Software" },
+    { id: "automation", label: "Automazioni" },
+    { id: "support", label: "Supporto" },
+  ];
 
-      <div className="relative isolate grid gap-8 lg:grid-cols-[240px_1fr]">
-        <aside className="relative z-20 h-fit space-y-6 rounded-2xl border border-zinc-800 bg-zinc-900/80 p-5 backdrop-blur-md lg:sticky lg:top-24">
+  return (
+    <div className="pb-20">
+      <PageHero
+        eyebrow="Abbonamenti mensili"
+        title={
+          <>
+            Store
+            <span className="mt-1 block text-zinc-400">prodotti pronti, rinnovo chiaro.</span>
+          </>
+        }
+        description="Bot, web e automazioni in abbonamento. Attivi il piano, lo gestisci dal profilo e lo interrompi quando non ti serve più."
+      />
+
+      <div className="page-shell relative isolate grid gap-8 py-12 lg:grid-cols-[240px_1fr] lg:py-16">
+        <aside className="surface-strong relative z-20 h-fit space-y-6 p-5 lg:sticky lg:top-24">
           <div>
-            <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-fuchsia-400">Disponibilità</p>
+            <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-violet-300">
+              Disponibilità
+            </p>
             <label className="mb-2 flex cursor-pointer items-center gap-2 text-sm text-zinc-300">
               <input type="checkbox" checked={showAvailable} onChange={(e) => setShowAvailable(e.target.checked)} className="accent-fuchsia-500" />
               Disponibile ({countAvailable})
@@ -109,110 +115,71 @@ export default function StorePage() {
             </label>
           </div>
 
-          <div>
-            <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-fuchsia-400">Tipo prodotto</p>
+          <div className="soft-divider pt-5">
+            <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-violet-300">Tipo prodotto</p>
             <div className="flex flex-wrap gap-2">
-              {CATEGORIES.map((c) => (
-                <button
-                  key={c.id}
-                  type="button"
-                  onClick={() => setSelectedCategory(c.id)}
-                  className={`rounded-full border px-3 py-1 text-xs font-medium transition ${
-                    selectedCategory === c.id
-                      ? "border-violet-500 bg-violet-500/20 text-violet-200"
-                      : "border-zinc-700 text-zinc-400 hover:border-zinc-500"
-                  }`}
-                >
+              {categories.map((c) => (
+                <button key={c.id} type="button" onClick={() => setSelectedCategory(c.id)}
+                  className={`chip transition ${selectedCategory === c.id ? "chip-active" : "hover:border-zinc-500"}`}>
                   {c.label}
                 </button>
               ))}
             </div>
           </div>
 
-          <div>
-            <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-fuchsia-400">Prezzo / mese</p>
+          <div className="soft-divider pt-5">
+            <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-violet-300">Prezzo max</p>
             <div className="mb-2 flex justify-between text-sm text-zinc-400">
               <span>€0</span>
-              <span>€{maxPrice}</span>
+              <span className="font-medium text-white">€{maxPrice}</span>
             </div>
             <input type="range" min={0} max={priceCeiling} value={maxPrice} onChange={(e) => setMaxPrice(Number(e.target.value))} className="w-full accent-fuchsia-500" />
           </div>
         </aside>
 
-        <div className="relative z-0 grid gap-6 overflow-visible sm:grid-cols-2 sm:gap-8 xl:grid-cols-3">
+        <div className="relative z-0 grid gap-6 overflow-visible sm:grid-cols-2 sm:gap-7 xl:grid-cols-3">
           {filtered.length === 0 && (
             <div className="col-span-full">
-              <EmptyState
-                variant="store"
-                title="Nessun servizio con questi filtri"
-                description="Prova a cambiare categoria o togli i filtri attivi."
-                codeHint="// filter returned [] — reset e riprova"
-              />
+              <EmptyState variant="store" title="Nessun servizio con questi filtri" description="Prova a cambiare categoria o togli i filtri attivi." codeHint="// filter returned [] — reset e riprova" />
             </div>
           )}
           {filtered.map((service, i) => (
-            <motion.div
-              key={service.id}
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.05 }}
-              className={`card-lift relative flex flex-col overflow-hidden rounded-2xl border p-6 card-shine box-glow-hover ${
-                service.popular ? "border-violet-500/50 bg-violet-500/5 box-glow" : "border-zinc-800 bg-zinc-900/40"
-              }`}
-            >
+            <motion.div key={service.id} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
+              className={`card-lift card-shine relative flex flex-col overflow-hidden p-6 ${service.popular ? "surface-glow" : "surface"}`}>
               <div className="mb-3 flex min-h-[1.5rem] items-center justify-between gap-2">
                 {service.popular ? (
-                  <span className="inline-flex shrink-0 items-center rounded-full bg-gradient-to-r from-violet-600 to-cyan-500 px-3 py-1 text-[11px] font-semibold text-white shadow-[0_0_16px_rgba(139,92,246,0.45)]">
-                    Più richiesto
-                  </span>
-                ) : (
-                  <span />
-                )}
-                {service.available === false && (
-                  <span className="rounded-full bg-zinc-800 px-2 py-0.5 text-[10px] text-zinc-400">Esaurito</span>
-                )}
+                  <span className="inline-flex shrink-0 items-center rounded-full bg-gradient-to-r from-violet-600 to-cyan-500 px-3 py-1 text-[11px] font-semibold text-white shadow-[0_0_16px_rgba(139,92,246,0.45)]">Più richiesto</span>
+                ) : (<span />)}
+                {service.available === false && <span className="chip text-zinc-400">Esaurito</span>}
               </div>
-
               <Link href={`/store/${service.id}`} className="group">
-                <h3 className="text-xl font-semibold text-white transition-colors group-hover:text-violet-300">{service.name}</h3>
+                <h3 className="text-xl font-semibold text-white transition-colors group-hover:text-violet-200">{service.name}</h3>
                 <p className="mt-2 line-clamp-3 text-sm text-zinc-400">{service.description}</p>
               </Link>
-
               <div className="mb-5 mt-4">
                 {service.discountPercent && service.discountPercent > 0 ? (
                   <>
                     <span className="mr-2 text-lg text-zinc-500 line-through">€{service.price}</span>
-                    <span className="text-3xl font-bold text-white">
-                      €{Math.round(service.price * (1 - service.discountPercent / 100) * 100) / 100}
-                    </span>
-                    <span className="ml-2 text-xs text-green-400">-{service.discountPercent}%</span>
+                    <span className="price-tag">€{Math.round(service.price * (1 - service.discountPercent / 100) * 100) / 100}</span>
+                    <span className="ml-2 text-xs text-emerald-400">-{service.discountPercent}%</span>
                   </>
                 ) : (
-                  <span className="text-3xl font-bold text-white">€{service.price}</span>
+                  <span className="price-tag">€{service.price}</span>
                 )}
                 <span className="ml-1 text-sm text-zinc-500">/ mese</span>
               </div>
-
               <ul className="mb-6 flex-1 space-y-2">
                 {service.features.slice(0, 5).map((f) => (
                   <li key={f} className="flex items-start gap-2 text-sm text-zinc-300">
-                    <Check className="mt-0.5 h-4 w-4 shrink-0 text-violet-400" />
-                    {f}
+                    <Check className="mt-0.5 h-4 w-4 shrink-0 text-violet-400" />{f}
                   </li>
                 ))}
               </ul>
-
               <div className="mt-auto flex flex-col gap-2">
-                <Link href={`/store/${service.id}`} className="link-underline text-center text-sm text-violet-400">
-                  Vedi dettagli
-                </Link>
-                <button
-                  disabled={service.available === false}
-                  onClick={() => addItem(service)}
-                  className="btn-press inline-flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-violet-600 to-cyan-500 px-5 py-3 text-sm font-semibold text-white btn-glow disabled:cursor-not-allowed disabled:opacity-40"
-                >
-                  <ShoppingCart className="h-4 w-4" />
-                  Aggiungi al carrello
+                <Link href={`/store/${service.id}`} className="link-underline text-center text-sm text-violet-300">Vedi dettagli</Link>
+                <button disabled={service.available === false} onClick={() => addItem(service)}
+                  className="btn-press inline-flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-violet-600 to-cyan-500 px-5 py-3 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-40">
+                  <ShoppingCart className="h-4 w-4" />Aggiungi al carrello
                 </button>
               </div>
             </motion.div>
